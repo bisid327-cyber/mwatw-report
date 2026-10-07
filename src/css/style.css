@@ -1184,7 +1184,7 @@ textarea.builder-input {
 
 .exec-kpi {
   position: relative;
-  background: var(--surface-color);
+  background: #f6faf7;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   display: flex;
