@@ -1068,32 +1068,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         const totalMetricCount = visibleSections.reduce((a, s) => a + (s.metrics ? s.metrics.length : 0), 0);
 
         viewContainer.innerHTML = `
-            <!-- Top Sticky Action Bar (Instant access on desktop & mobile) -->
-            <div class="viewer-action-bar-top">
+            <!-- Top Sticky Navigation & Desktop Toolbar -->
+            <header class="viewer-top-bar" role="banner">
                 <div class="viewer-bar-left">
-                    <button class="btn btn-secondary btn-sm" id="vw-back" title="Return to Report List">
-                        <i class="fa-solid fa-arrow-left"></i> Back
+                    <button class="btn btn-secondary btn-sm" id="vw-back" title="Return to Report List" aria-label="Back to reports list">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
                     </button>
                     <div class="viewer-bar-info">
                         <span class="viewer-status-badge ${report.status === 'Published' ? 'published' : 'draft'}">${report.status}</span>
                         <span class="viewer-title-chip" title="${report.title}">${report.title}</span>
                     </div>
                 </div>
-                <div class="viewer-actions-group">
+                
+                <!-- Desktop Only Action Group (Hidden on mobile < 768px) -->
+                <div class="viewer-actions-desktop" role="toolbar" aria-label="Report actions">
                     <button class="btn btn-primary btn-sm btn-action-pdf" id="vw-pdf" title="Export report as print-ready PDF">
                         <i class="fa-solid fa-file-pdf"></i> <span>Export PDF</span>
                     </button>
-                    <button class="btn btn-secondary btn-sm btn-action-csv" id="vw-csv" title="Download all report data as CSV">
+                    <button class="btn btn-secondary btn-sm btn-action-csv" id="vw-csv" title="Download report dataset as CSV">
                         <i class="fa-solid fa-file-csv"></i> <span>CSV</span>
                     </button>
                     <button class="btn btn-secondary btn-sm btn-action-share" id="vw-share" title="Share via WhatsApp, Social & Direct Link">
                         <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
                     </button>
-                    <button class="btn btn-secondary btn-sm btn-action-edit" id="vw-edit" title="Edit this report">
+                    <button class="btn btn-secondary btn-sm btn-action-edit" id="vw-edit" title="Edit this report in Builder">
                         <i class="fa-solid fa-pen"></i> <span>Edit</span>
                     </button>
                 </div>
-            </div>
+            </header>
 
             <div class="exec-report" id="report-printable" style="font-family: '${report.font}', sans-serif;">
                 <!-- Branded Header Banner -->
@@ -1144,26 +1146,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
 
-            <!-- Bottom Action Dock -->
-            <div class="viewer-action-bar">
-                <button class="btn btn-secondary btn-sm" id="vw-back-bottom">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Reports
+            <!-- 2026 Mobile Floating Action Capsule Dock (Pill island, visible only on mobile < 768px) -->
+            <nav class="viewer-mobile-dock" aria-label="Report quick actions">
+                <button class="dock-pill-btn dock-btn-pdf" id="dock-btn-pdf" aria-label="Export PDF report" title="Export PDF">
+                    <span class="dock-icon-wrapper"><i class="fa-solid fa-file-pdf"></i></span>
+                    <span class="dock-pill-label">Export</span>
                 </button>
-                <div style="display:flex; gap: var(--space-2); flex-wrap: wrap;">
-                    <button class="btn btn-primary btn-sm btn-action-pdf" id="vw-pdf-bottom">
-                        <i class="fa-solid fa-file-pdf"></i> Export PDF
-                    </button>
-                    <button class="btn btn-secondary btn-sm btn-action-csv" id="vw-csv-bottom">
-                        <i class="fa-solid fa-file-csv"></i> CSV
-                    </button>
-                    <button class="btn btn-secondary btn-sm btn-action-share" id="vw-share-bottom">
-                        <i class="fa-solid fa-share-nodes"></i> Share
-                    </button>
-                    <button class="btn btn-secondary btn-sm btn-action-edit" id="vw-edit-bottom">
-                        <i class="fa-solid fa-pen"></i> Edit
-                    </button>
-                </div>
-            </div>
+                <button class="dock-pill-btn dock-btn-csv" id="dock-btn-csv" aria-label="Download CSV dataset" title="Download CSV">
+                    <span class="dock-icon-wrapper"><i class="fa-solid fa-file-csv"></i></span>
+                    <span class="dock-pill-label">CSV</span>
+                </button>
+                <button class="dock-pill-btn dock-btn-share" id="dock-btn-share" aria-label="Share report" title="Share Report">
+                    <span class="dock-icon-wrapper"><i class="fa-solid fa-share-nodes"></i></span>
+                    <span class="dock-pill-label">Share</span>
+                </button>
+                <button class="dock-pill-btn dock-btn-edit" id="dock-btn-edit" aria-label="Edit report" title="Edit in Studio">
+                    <span class="dock-icon-wrapper"><i class="fa-solid fa-pen"></i></span>
+                    <span class="dock-pill-label">Edit</span>
+                </button>
+            </nav>
         `;
 
         // Scroll to top
@@ -1174,55 +1175,65 @@ document.addEventListener('DOMContentLoaded', async () => {
         gsap.from(".exec-kpi", { y: 30, opacity: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.4)" });
         gsap.from(".exec-section", { y: 20, opacity: 0, duration: 0.5, stagger: 0.12, delay: 0.3, ease: "power2.out" });
 
-        // Wire Up PDF Export (Top and Bottom)
+        // Wire Up PDF Export (Desktop Toolbar & Mobile Dock)
         const pdfHandler = (e) => {
             const btn = e.currentTarget;
             exportReportPdf(report, btn);
         };
-        const pdfTop = document.getElementById('vw-pdf');
-        const pdfBottom = document.getElementById('vw-pdf-bottom');
-        if (pdfTop) pdfTop.addEventListener('click', pdfHandler);
-        if (pdfBottom) pdfBottom.addEventListener('click', pdfHandler);
+        const pdfDesktop = document.getElementById('vw-pdf');
+        const pdfDock = document.getElementById('dock-btn-pdf');
+        if (pdfDesktop) pdfDesktop.addEventListener('click', pdfHandler);
+        if (pdfDock) pdfDock.addEventListener('click', pdfHandler);
 
-        // Wire Up CSV Export (Top and Bottom)
-        const csvHandler = () => {
-            exportReportCsv(report);
-        };
-        const csvTop = document.getElementById('vw-csv');
-        const csvBottom = document.getElementById('vw-csv-bottom');
-        if (csvTop) csvTop.addEventListener('click', csvHandler);
-        if (csvBottom) csvBottom.addEventListener('click', csvHandler);
+        // Wire Up CSV Export (Desktop Toolbar & Mobile Dock)
+        const csvHandler = () => exportReportCsv(report);
+        const csvDesktop = document.getElementById('vw-csv');
+        const csvDock = document.getElementById('dock-btn-csv');
+        if (csvDesktop) csvDesktop.addEventListener('click', csvHandler);
+        if (csvDock) csvDock.addEventListener('click', csvHandler);
 
-        // Wire Up Share Modal (Top and Bottom)
-        const shareHandler = () => {
+        // Wire Up Share Modal (Desktop Toolbar & Mobile Dock)
+        const shareHandler = async () => {
+            // Modern 2026: If on mobile device and Web Share API is available, trigger native share sheet
+            if (window.innerWidth < 768 && navigator.share) {
+                try {
+                    await navigator.share({
+                        title: report.title,
+                        text: report.subtitle || "MATW Project Gaza Emergency Impact Report",
+                        url: window.location.href
+                    });
+                    showToast('Shared successfully!', 'success');
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return; // User dismissed share sheet
+                }
+            }
             openShareModal({
                 title: report.title,
                 subtitle: report.subtitle,
                 url: window.location.href
             });
         };
-        const shareTop = document.getElementById('vw-share');
-        const shareBottom = document.getElementById('vw-share-bottom');
-        if (shareTop) shareTop.addEventListener('click', shareHandler);
-        if (shareBottom) shareBottom.addEventListener('click', shareHandler);
+        const shareDesktop = document.getElementById('vw-share');
+        const shareDock = document.getElementById('dock-btn-share');
+        if (shareDesktop) shareDesktop.addEventListener('click', shareHandler);
+        if (shareDock) shareDock.addEventListener('click', shareHandler);
 
-        // Wire Up Edit (Top and Bottom)
+        // Wire Up Edit (Desktop Toolbar & Mobile Dock)
         const editHandler = () => {
             renderReportBuilder(reportId);
             viewContainer.scrollTop = 0;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-        const editTop = document.getElementById('vw-edit');
-        const editBottom = document.getElementById('vw-edit-bottom');
-        if (editTop) editTop.addEventListener('click', editHandler);
-        if (editBottom) editBottom.addEventListener('click', editHandler);
+        const editDesktop = document.getElementById('vw-edit');
+        const editDock = document.getElementById('dock-btn-edit');
+        if (editDesktop) editDesktop.addEventListener('click', editHandler);
+        if (editDock) editDock.addEventListener('click', editHandler);
 
-        // Wire Up Back (Top and Bottom)
+        // Wire Up Back Button
         const backHandler = () => renderReportList();
-        const backTop = document.getElementById('vw-back');
-        const backBottom = document.getElementById('vw-back-bottom');
-        if (backTop) backTop.addEventListener('click', backHandler);
-        if (backBottom) backBottom.addEventListener('click', backHandler);
+        const backBtn = document.getElementById('vw-back');
+        if (backBtn) backBtn.addEventListener('click', backHandler);
     }
 
     // ──────────────────────────────────

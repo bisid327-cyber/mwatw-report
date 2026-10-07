@@ -608,8 +608,10 @@ body {
   .top-nav-bar,
   .sidebar,
   .sidebar-backdrop,
+  .viewer-top-bar,
   .viewer-action-bar-top,
   .viewer-action-bar,
+  .viewer-mobile-dock,
   .toast-container,
   .modern-modal-overlay,
   .bg-image-container,
@@ -1631,25 +1633,23 @@ textarea.builder-input {
 }
 
 /* ───────────────────────────────────────────────────────────── */
-/* Report Viewer Sticky Action Bar (Desktop, Tablet & Mobile)   */
+/* 2026 Report Viewer Unified Toolbar (Desktop) & Nav (Mobile)   */
 /* ───────────────────────────────────────────────────────────── */
-.viewer-action-bar-top {
+.viewer-top-bar {
   position: sticky;
-  top: 0;
+  top: 8px;
   z-index: 45;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px 18px;
+  padding: 10px 18px;
   margin-bottom: 24px;
-  background: rgba(18, 52, 74, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 38, 54, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
   transition: all 0.3s ease;
 }
 
@@ -1657,22 +1657,24 @@ textarea.builder-input {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .viewer-bar-info {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .viewer-status-badge {
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 9999px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .viewer-status-badge.published {
@@ -1689,23 +1691,23 @@ textarea.builder-input {
 
 .viewer-title-chip {
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #ffffff;
-  max-width: 280px;
+  max-width: 320px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.viewer-actions-group {
+/* Desktop Action Group (Hidden on Mobile) */
+.viewer-actions-desktop {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
-.viewer-actions-group .btn {
+.viewer-actions-desktop .btn {
   font-size: 0.82rem;
   padding: 8px 14px;
   border-radius: 8px;
@@ -1815,35 +1817,109 @@ textarea.builder-input {
 }
 
 /* Back Button */
-#vw-back, #vw-back-bottom {
+#vw-back {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-#vw-back:hover, #vw-back-bottom:hover {
+#vw-back:hover {
   background: rgba(255, 255, 255, 0.22) !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
 }
 
-#vw-back:active, #vw-back-bottom:active, #vw-back.is-clicked, #vw-back-bottom.is-clicked {
+#vw-back:active, #vw-back.is-clicked {
   transform: scale(0.94) translateY(1px) !important;
   background: rgba(255, 255, 255, 0.38) !important;
   color: #ffffff !important;
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.6) !important;
 }
 
-.viewer-action-bar {
+/* ───────────────────────────────────────────────────────────── */
+/* 2026 Mobile Floating Action Capsule Dock (Hidden on Desktop) */
+/* ───────────────────────────────────────────────────────────── */
+.viewer-mobile-dock {
+  display: none;
+}
+
+.dock-pill-btn {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 14px 20px;
-  margin-top: 24px;
-  background: rgba(18, 52, 74, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  justify-content: center;
+  gap: 3px;
+  padding: 7px 14px;
+  min-width: 62px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.dock-pill-btn .dock-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.dock-pill-btn .dock-pill-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* Dock Button Flavors */
+.dock-btn-pdf {
+  background: linear-gradient(135deg, rgba(0, 151, 208, 0.32) 0%, rgba(3, 115, 179, 0.5) 100%) !important;
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  color: #38bdf8 !important;
+}
+.dock-btn-pdf:active, .dock-btn-pdf.is-clicked {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  transform: scale(0.92);
+  box-shadow: 0 0 16px rgba(0, 151, 208, 0.85);
+}
+
+.dock-btn-csv {
+  background: rgba(16, 185, 129, 0.14) !important;
+  border-color: rgba(16, 185, 129, 0.32) !important;
+  color: #34d399 !important;
+}
+.dock-btn-csv:active, .dock-btn-csv.is-clicked {
+  background: #059669 !important;
+  color: #ffffff !important;
+  transform: scale(0.92);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.85);
+}
+
+.dock-btn-share {
+  background: rgba(255, 0, 102, 0.16) !important;
+  border-color: rgba(255, 0, 102, 0.38) !important;
+  color: #ff4d94 !important;
+}
+.dock-btn-share:active, .dock-btn-share.is-clicked {
+  background: #e11d48 !important;
+  color: #ffffff !important;
+  transform: scale(0.92);
+  box-shadow: 0 0 16px rgba(255, 0, 102, 0.85);
+}
+
+.dock-btn-edit {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  color: #e2e8f0 !important;
+}
+.dock-btn-edit:active, .dock-btn-edit.is-clicked {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  transform: scale(0.92);
 }
 
 /* ───────────────────────────────────────────────────────────── */
@@ -2279,13 +2355,20 @@ textarea.builder-input {
 }
 
 /* ───────────────────────────────────────────────────────────── */
-/* Responsive Tweaks                                            */
+/* 2026 Responsive Architecture (Mobile Dock & Bottom Sheet)    */
 /* ───────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .viewer-action-bar-top {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 10px 14px;
+  /* 1. Hide desktop action toolbar on mobile so there is NEVER duplication */
+  .viewer-actions-desktop {
+    display: none !important;
+  }
+
+  /* 2. Slim, clean top bar on mobile (Back + Title chip only) */
+  .viewer-top-bar {
+    top: 6px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    border-radius: 12px;
   }
 
   .viewer-bar-left {
@@ -2294,19 +2377,64 @@ textarea.builder-input {
   }
 
   .viewer-title-chip {
-    max-width: 180px;
+    max-width: 160px;
+    font-size: 0.82rem;
   }
 
-  .viewer-actions-group {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
+  /* 3. Activate 2026 Mobile Floating Action Capsule Dock */
+  .viewer-mobile-dock {
+    display: flex !important;
+    position: fixed !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 95 !important;
+    background: rgba(10, 27, 40, 0.92) !important;
+    backdrop-filter: blur(24px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 9999px !important;
+    padding: 6px 8px !important;
+    gap: 6px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 24px rgba(0, 151, 208, 0.25) !important;
+    animation: dockSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    max-width: calc(100vw - 24px) !important;
   }
 
-  .viewer-actions-group .btn {
-    justify-content: center;
-    padding: 8px 10px;
+  /* 4. Complete Content Clearance: NEVER overlap report tables, metric values or footer */
+  .view-container, .main-content {
+    padding-bottom: 120px !important;
+  }
+
+  .exec-report {
+    margin-bottom: 96px !important;
+  }
+
+  /* 5. 2026 Mobile Bottom Sheet for Share Dialog */
+  .modern-modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .modern-modal-card {
+    border-radius: 26px 26px 0 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+    padding: 14px 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px !important;
+    animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border-bottom: none !important;
+    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .sheet-grab-handle {
+    display: block !important;
+    width: 44px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.35) !important;
+    border-radius: 9999px !important;
+    margin: 0 auto 16px auto !important;
   }
 
   .share-channels-grid {
@@ -2324,11 +2452,40 @@ textarea.builder-input {
   }
 }
 
+@keyframes dockSlideUp {
+  from {
+    transform: translate(-50%, 40px) scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes sheetSlideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 480px) {
   .btn-nav-share span {
     display: none;
   }
   .btn-nav-share {
     padding: 6px 10px;
+  }
+  .dock-pill-btn {
+    padding: 6px 10px;
+    min-width: 56px;
+  }
+  .dock-pill-btn .dock-pill-label {
+    font-size: 0.64rem;
   }
 }
