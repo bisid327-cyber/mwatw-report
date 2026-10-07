@@ -43,7 +43,7 @@
         <!-- Top Navigation Bar — Full Width Gradient Header -->
         <header class="top-nav-bar">
             <div class="top-nav-left">
-                <button id="mobile-menu-toggle" class="btn-icon top-nav-hamburger">
+                <button id="mobile-menu-toggle" class="btn-icon top-nav-hamburger" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <img src="assets/matw_logo.png" alt="MATW" class="top-nav-logo">
@@ -85,7 +85,7 @@
             <!-- Sidebar / Navigation -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-close-wrapper">
-                    <button id="mobile-menu-close" class="btn-icon">
+                    <button id="mobile-menu-close" class="btn-icon" aria-label="Close navigation">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
@@ -209,9 +209,91 @@
         </div>
     </div>
 
+    <!-- Global Modern Image Upload & Asset Manager Modal -->
+    <div id="image-upload-modal" class="modern-modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
+        <div class="modern-modal-card image-modal-card">
+            <div class="sheet-grab-handle"></div>
+            <div class="modal-header">
+                <div class="modal-header-title">
+                    <i class="fa-solid fa-photo-film"></i>
+                    <h3 id="image-modal-title">Select or Upload Image</h3>
+                </div>
+                <button class="modal-close-btn" id="image-modal-close" aria-label="Close image upload dialog">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Mode Tabs -->
+            <div class="image-modal-tabs" role="tablist">
+                <button class="image-modal-tab active" data-tab="upload" type="button" id="tab-btn-upload">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i> Upload File
+                </button>
+                <button class="image-modal-tab" data-tab="library" type="button" id="tab-btn-library">
+                    <i class="fa-solid fa-boxes-stacked"></i> MATW Assets
+                </button>
+                <button class="image-modal-tab" data-tab="url" type="button" id="tab-btn-url">
+                    <i class="fa-solid fa-link"></i> Web URL
+                </button>
+            </div>
+
+            <!-- Tab 1: Upload File -->
+            <div class="image-tab-content active" id="tab-content-upload">
+                <div id="modal-drop-zone" class="modal-upload-zone" tabindex="0" role="button" aria-label="Drop file or click to browse">
+                    <input type="file" id="modal-file-input" accept="image/png, image/jpeg, image/webp, image/svg+xml" style="display: none;">
+                    <div class="modal-upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                    <div class="modal-upload-text">
+                        <strong>Click to Browse</strong> or Drag & Drop File
+                    </div>
+                    <div class="modal-upload-hint">Supports PNG, JPG, WEBP, SVG (Max 10MB)</div>
+                </div>
+            </div>
+
+            <!-- Tab 2: MATW Presets Library -->
+            <div class="image-tab-content" id="tab-content-library" style="display: none;">
+                <p class="image-tab-desc">Choose from official MATW Project brand and relief response assets:</p>
+                <div class="image-presets-grid" id="image-presets-grid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Tab 3: Web URL -->
+            <div class="image-tab-content" id="tab-content-url" style="display: none;">
+                <label class="share-label" for="image-url-input">Direct Image Link</label>
+                <div class="share-copy-row">
+                    <input type="url" id="image-url-input" class="share-input" placeholder="https://example.com/photo.jpg">
+                    <button class="btn btn-secondary" id="btn-preview-url" type="button">
+                        <i class="fa-solid fa-magnifying-glass"></i> Load
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Preview Stage -->
+            <div class="image-preview-stage" id="image-preview-stage" style="display: none;">
+                <div class="image-preview-header">
+                    <span class="image-preview-badge"><i class="fa-solid fa-check"></i> Selected Image</span>
+                    <button type="button" class="btn-clear-preview" id="btn-clear-preview">
+                        <i class="fa-solid fa-trash-can"></i> Remove
+                    </button>
+                </div>
+                <div class="image-preview-container">
+                    <img id="image-preview-img" src="" alt="Selected Preview">
+                </div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div class="image-modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-image-modal" type="button">Cancel</button>
+                <button class="btn btn-primary" id="btn-apply-image-modal" type="button" disabled>
+                    <i class="fa-solid fa-check"></i> Apply Image
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="js/image-picker.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

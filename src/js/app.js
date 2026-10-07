@@ -181,10 +181,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         modal.style.display = 'flex';
-        gsap.fromTo(modal.querySelector('.modern-modal-card'), 
-            { scale: 0.9, opacity: 0 }, 
-            { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(1.5)" }
-        );
     }
 
     function closeShareModal() {
@@ -309,8 +305,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         clone.style.width = '820px';
         clone.style.maxWidth = '820px';
         clone.style.padding = '24px';
-        clone.style.background = '#0d273a';
-        clone.style.color = '#ffffff';
+        clone.style.background = '#ffffff';
+        clone.style.color = '#12344a';
 
         // Strip GSAP inline transforms, transitions, and hover states that cause duplicate rendering in html2canvas
         clone.querySelectorAll('*').forEach(node => {
@@ -351,7 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 useCORS: true, 
                 allowTaint: true,
                 logging: false,
-                backgroundColor: '#0d273a',
+                backgroundColor: '#ffffff',
                 windowWidth: 840
             },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
@@ -479,10 +475,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const navItems = document.querySelectorAll('.nav-item');
     let sliderInterval = null;
 
+    function resetViewScroll() {
+        document.querySelector('.main-content').scrollTop = 0;
+    }
+
     // ──────────────────────────────────
     // VIEW 1: Action Overview (Bento Grid)
     // ──────────────────────────────────
     function renderOverview() {
+        resetViewScroll();
         if(document.getElementById('global-footer')) document.getElementById('global-footer').style.display = 'flex';
         if (sliderInterval) clearInterval(sliderInterval);
         let gridHtml = `
@@ -524,7 +525,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 4000);
         }
 
-        gsap.from(".bento-card", { y: 20, opacity: 0, duration: 0.8, stagger: 0.1, ease: "back.out(1.7)" });
+        // Render cards immediately so metrics remain visible in background tabs.
 
         document.querySelectorAll('.bento-card[data-id]').forEach(card => {
             card.addEventListener('click', () => {
@@ -539,6 +540,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // VIEW 2: Metric Detail View
     // ──────────────────────────────────
     function renderDetail(id) {
+        resetViewScroll();
         if(document.getElementById('global-footer')) document.getElementById('global-footer').style.display = 'flex';
         if (sliderInterval) clearInterval(sliderInterval);
         const metric = reportData.keyMetrics.find(m => m.id === id);
@@ -567,6 +569,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3A. Report List
     function renderReportList() {
+        resetViewScroll();
         if(document.getElementById('global-footer')) document.getElementById('global-footer').style.display = 'flex';
         if (sliderInterval) clearInterval(sliderInterval);
         const reports = getReports();
@@ -725,11 +728,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        gsap.from(".report-card, .studio-empty", { y: 30, opacity: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" });
+        // Keep report actions available immediately, without staggered entrance motion.
     }
 
     // 3B. Report Builder (Create / Edit)
     function renderReportBuilder(editId) {
+        resetViewScroll();
         if(document.getElementById('global-footer')) document.getElementById('global-footer').style.display = 'flex';
         if (sliderInterval) clearInterval(sliderInterval);
         const existing = editId ? getReports().find(r => r.id === editId) : null;
@@ -756,8 +760,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         let sectionsHtml = sections.map((sec, si) => {
             let metricsRows = sec.metrics.map((met, mi) => `
                 <div class="builder-metric-row">
-                    <input type="text" class="builder-input builder-input-sm" value="${met.label}" data-sec="${si}" data-met="${mi}" data-field="label" placeholder="Metric label">
-                    <input type="text" class="builder-input builder-input-sm" value="${met.value}" data-sec="${si}" data-met="${mi}" data-field="value" placeholder="Value">
+                    <label><span>Metric</span><input type="text" class="builder-input builder-input-sm" value="${met.label}" data-sec="${si}" data-met="${mi}" data-field="label" placeholder="Metric label"></label>
+                    <label><span>Value / unit</span><input type="text" class="builder-input builder-input-sm" value="${met.value}" data-sec="${si}" data-met="${mi}" data-field="value" placeholder="Value"></label>
                 </div>
             `).join('');
             return `
@@ -766,7 +770,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div id="drop-sec-icon-${si}" class="drop-zone" style="flex-shrink: 0; width: 44px; height: 44px; min-height: 44px; padding: 0; ${sec.iconImage ? `background-image:url(${sec.iconImage}); background-size:contain; background-repeat:no-repeat;` : ''}">
                             ${sec.iconImage ? '' : '<i class="fa-solid fa-image" style="font-size:14px; color:var(--text-secondary);"></i>'}
                         </div>
-                        <input type="text" class="builder-input" style="flex: 1;" value="${sec.title}" data-sec="${si}" data-field="sec-title">
+                        <input type="text" class="builder-input" aria-label="Section ${si + 1} title" style="flex: 1;" value="${sec.title}" data-sec="${si}" data-field="sec-title">
                         <label class="toggle-label" style="margin-bottom: 0;">
                             <input type="checkbox" ${sec.visible ? 'checked' : ''} data-sec="${si}" data-field="sec-visible">
                             <span>Visible</span>
@@ -778,7 +782,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
 
         viewContainer.innerHTML = `
-            <div class="detail-view" style="max-width: 100%;">
+            <div class="detail-view report-builder" style="max-width: 100%;">
                 <div class="studio-header" style="margin-bottom: var(--space-6);">
                     <h3><i class="fa-solid fa-pen-ruler"></i> ${existing ? 'Edit Report' : 'Create New Report'}</h3>
                     <button class="btn btn-secondary btn-sm" id="btn-back-list">
@@ -791,26 +795,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h4><span class="step-badge">1</span> Report Details</h4>
                     <div class="builder-row">
                         <div class="builder-field">
-                            <label>Report Title</label>
+                            <label for="b-title">Report title</label>
                             <input type="text" id="b-title" class="builder-input" value="${title}">
                         </div>
                         <div class="builder-field">
-                            <label>Subtitle</label>
+                            <label for="b-subtitle">Subtitle</label>
                             <input type="text" id="b-subtitle" class="builder-input" value="${subtitle}">
                         </div>
                     </div>
                     <div class="builder-row">
                         <div class="builder-field">
-                            <label>Start Date</label>
+                            <label for="b-start">Start date</label>
                             <input type="date" id="b-start" class="builder-input" value="${startDate}">
                         </div>
                         <div class="builder-field">
-                            <label>End Date</label>
+                            <label for="b-end">End date</label>
                             <input type="date" id="b-end" class="builder-input" value="${endDate}">
                         </div>
                     </div>
                     <div class="builder-field">
-                        <label>Introduction</label>
+                        <label for="b-intro">Introduction</label>
                         <textarea id="b-intro" class="builder-input" rows="3">${intro}</textarea>
                     </div>
                 </div>
@@ -826,7 +830,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h4><span class="step-badge">3</span> Branding</h4>
                     <div class="builder-row">
                         <div class="builder-field">
-                            <label>Typography</label>
+                            <label for="b-font">Typography</label>
                             <select id="b-font" class="builder-input">
                                 <option value="Montserrat" ${font === 'Montserrat' ? 'selected' : ''}>Brand (Montserrat)</option>
                                 <option value="Poppins" ${font === 'Poppins' ? 'selected' : ''}>Modern (Poppins)</option>
@@ -834,7 +838,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             </select>
                         </div>
                         <div class="builder-field">
-                            <label>Status</label>
+                            <label for="b-status">Status</label>
                             <select id="b-status" class="builder-input">
                                 <option value="Draft" ${status === 'Draft' ? 'selected' : ''}>Draft</option>
                                 <option value="Published" ${status === 'Published' ? 'selected' : ''}>Published</option>
@@ -873,43 +877,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         viewContainer.scrollTop = 0;
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Setup Drag and Drop
-        function setupDropZone(elId, onFile) {
-            const el = document.getElementById(elId);
-            if (!el) return;
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
-                el.addEventListener(evt, e => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                });
-            });
-            el.addEventListener('dragover', () => el.classList.add('drag-over'));
-            el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
-            el.addEventListener('drop', (e) => {
-                el.classList.remove('drag-over');
-                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                    const file = e.dataTransfer.files[0];
-                    if (!file.type.startsWith('image/')) return;
-                    const reader = new FileReader();
-                    reader.onload = (evt) => {
-                        const b64 = evt.target.result;
-                        onFile(b64);
-                        el.style.backgroundImage = `url(${b64})`;
-                        if (elId === 'drop-logo') {
-                            el.style.backgroundSize = 'contain';
-                            el.style.backgroundRepeat = 'no-repeat';
-                        }
-                        el.innerHTML = '';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        setupDropZone('drop-bg', (b64) => { bgImage = b64; });
-        setupDropZone('drop-logo', (b64) => { logoImage = b64; });
+        const picker = window.MatwImagePicker;
+        picker.bind(document.getElementById('drop-bg'), bgImage, value => { bgImage = value; }, 'report background');
+        picker.bind(document.getElementById('drop-logo'), logoImage, value => { logoImage = value; }, 'report logo');
         sections.forEach((sec, si) => {
-            setupDropZone(`drop-sec-icon-${si}`, (b64) => { sec.iconImage = b64; });
+            picker.bind(document.getElementById(`drop-sec-icon-${si}`), sec.iconImage || '', value => { sec.iconImage = value; }, `section ${si + 1} icon`);
         });
 
         // Collect form data
@@ -959,18 +931,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             let reports = getReports();
             const idx = reports.findIndex(r => r.id === data.id);
             if (idx >= 0) reports[idx] = data; else reports.unshift(data);
-            saveReports(reports);
-            return data;
+            try {
+                saveReports(reports);
+                return data;
+            } catch (error) {
+                showToast('Report could not be saved. Browser storage may be full. Try smaller images or remove unused images.', 'error', 7000);
+                return null;
+            }
         }
 
         document.getElementById('btn-back-list').addEventListener('click', () => renderReportList());
         document.getElementById('btn-save-report').addEventListener('click', () => {
-            saveReport();
+            if (!saveReport()) return;
             showToast('Report updated and saved!', 'success');
             renderReportList();
         });
         document.getElementById('btn-save-preview').addEventListener('click', () => {
             const data = saveReport();
+            if (!data) return;
             showToast('Report saved! Live preview ready.', 'success');
             renderReportViewer(data.id);
         });
@@ -980,6 +958,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3C. Report Viewer — Premium Executive Report
     // ──────────────────────────────────
     function renderReportViewer(reportId) {
+        resetViewScroll();
         if(document.getElementById('global-footer')) document.getElementById('global-footer').style.display = 'none';
         if (sliderInterval) clearInterval(sliderInterval);
         const report = getReports().find(r => r.id === reportId);
@@ -1001,11 +980,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        // Build hero KPI strip from first metric of each section
+        // Each KPI describes a reported metric; counts do not imply growth.
         let heroKpis = visibleSections.slice(0, 4).map((sec, i) => {
-            const leadMetric = sec.metrics && sec.metrics[0];
+            const visibleMetrics = (sec.metrics || []).filter(metric => metric.visible !== false);
+            const leadMetric = visibleMetrics[0];
             const colors = ['#0097D0', '#0373B3', '#074B96', '#e91e63'];
-            const icons = ['fa-chart-line', 'fa-arrow-trend-up', 'fa-chart-bar', 'fa-chart-pie'];
+            const sectionIcons = { meals: 'fa-bowl-food', water: 'fa-droplet', medical: 'fa-kit-medical', shelter: 'fa-tent', orphans: 'fa-children' };
             const accent = colors[i % 4];
             return `
                 <div class="exec-kpi" style="--kpi-accent: ${accent};">
@@ -1013,13 +993,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="exec-kpi-body">
                         <div class="exec-kpi-top">
                             <span class="exec-kpi-label">${leadMetric ? leadMetric.label : sec.title}</span>
-                            <span class="exec-kpi-icon"><i class="fa-solid ${icons[i % 4]}"></i></span>
+                            <span class="exec-kpi-icon" aria-hidden="true"><i class="fa-solid ${sectionIcons[sec.id] || 'fa-chart-bar'}"></i></span>
                         </div>
                         <div class="exec-kpi-value">${leadMetric ? leadMetric.value : '—'}</div>
                         <div class="exec-kpi-footer">
                             <span class="exec-kpi-section">${sec.title}</span>
                             <span class="exec-kpi-trend">
-                                <i class="fa-solid fa-arrow-up"></i> ${sec.metrics ? sec.metrics.length : 0} metrics
+                                ${visibleMetrics.length} metrics
                             </span>
                         </div>
                     </div>
@@ -1172,8 +1152,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
         // Staggered entrance animations
-        gsap.from(".exec-kpi", { y: 30, opacity: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.4)" });
-        gsap.from(".exec-section", { y: 20, opacity: 0, duration: 0.5, stagger: 0.12, delay: 0.3, ease: "power2.out" });
+        // Apply imagery through DOM properties, without changing its original colors.
+        const hero = document.querySelector('.exec-hero-banner');
+        if (report.bgImage) {
+            hero.style.backgroundImage = `linear-gradient(rgba(18,52,74,0.85), rgba(13,45,66,0.85)), url(${JSON.stringify(report.bgImage)})`;
+            hero.style.backgroundSize = 'cover';
+            hero.style.backgroundPosition = 'center';
+        }
+        if (report.logoImage) document.querySelector('.exec-hero-logo').style.filter = 'none';
+
+        // Keep report content visible immediately, including background tabs and exports.
 
         // Wire Up PDF Export (Desktop Toolbar & Mobile Dock)
         const pdfHandler = (e) => {
@@ -1240,6 +1228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Legal Pages
     // ──────────────────────────────────
     function renderLegal(type) {
+        resetViewScroll();
         if (sliderInterval) clearInterval(sliderInterval);
         
         let title = type === 'privacy' ? 'Privacy Policy' : 'Terms of Service';
@@ -1263,6 +1252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Auth View Logic
     // ──────────────────────────────────
     function renderAuthView(isLogin = true) {
+        resetViewScroll();
         if(document.getElementById('global-footer')) document.getElementById('global-footer').style.display = 'flex';
         if (sliderInterval) clearInterval(sliderInterval);
         
@@ -1510,11 +1500,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     function openMobileMenu() {
         sidebar.classList.add('mobile-open');
         backdrop.classList.add('show');
+        menuToggle.setAttribute('aria-expanded', 'true');
+        menuClose.focus();
     }
 
     function closeMobileMenu() {
         sidebar.classList.remove('mobile-open');
         backdrop.classList.remove('show');
+        menuToggle.setAttribute('aria-expanded', 'false');
     }
 
     if(menuToggle) menuToggle.addEventListener('click', openMobileMenu);
@@ -1539,4 +1532,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initial Render
     renderOverview();
 });
-
