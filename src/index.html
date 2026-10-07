@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO & Browser Meta -->
+    <title>MATW Project | Gaza Emergency Impact Report</title>
+    <meta name="description" content="Explore the MATW Project interactive dashboard visualizing key humanitarian metrics, relief efforts, and impact data in Gaza.">
+    <meta name="keywords" content="MATW Project, Gaza Emergency, Humanitarian Aid, Impact Report, Relief Efforts, Charity, Donation">
+    <meta name="author" content="MATW Project">
+    <meta name="theme-color" content="#0373B3">
+    
+    <!-- Open Graph / Social Share Meta -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://matwproject.org/gaza-emergency">
+    <meta property="og:title" content="MATW Project | Gaza Emergency Impact Report">
+    <meta property="og:description" content="Explore the MATW Project interactive dashboard visualizing key humanitarian metrics, relief efforts, and impact data in Gaza.">
+    <meta property="og:image" content="https://matwproject.org/assets/matw_logo.png">
+
+    <!-- Twitter Card Meta -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://matwproject.org/gaza-emergency">
+    <meta property="twitter:title" content="MATW Project | Gaza Emergency Impact Report">
+    <meta property="twitter:description" content="Explore the MATW Project interactive dashboard visualizing key humanitarian metrics, relief efforts, and impact data in Gaza.">
+    <meta property="twitter:image" content="https://matwproject.org/assets/matw_logo.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    
+    <!-- Typography: Montserrat (Headings) & Poppins (Body) matching MATW Branding -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons: FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Top Navigation Bar — Full Width Gradient Header -->
+        <header class="top-nav-bar">
+            <div class="top-nav-left">
+                <button id="mobile-menu-toggle" class="btn-icon top-nav-hamburger">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <img src="assets/matw_logo.png" alt="MATW" class="top-nav-logo">
+                <div class="top-nav-titles">
+                    <h2>Gaza Impact Report</h2>
+                    <span class="top-nav-date">20 September 2026</span>
+                </div>
+            </div>
+            <div class="auth-section" id="auth-section">
+                <button class="btn-nav-auth" id="btn-open-auth">
+                    <i class="fa-solid fa-user"></i> Sign In
+                </button>
+                <!-- Logged in state (Hidden initially) -->
+                <div id="user-profile-menu" style="display: none; align-items: center; gap: var(--space-3);">
+                    <div style="text-align: right;">
+                        <div id="user-name" style="font-weight: 600; font-size: var(--text-sm); color: #fff;">John Doe</div>
+                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.7);">Cloud Sync Active</div>
+                    </div>
+                    <div class="user-avatar" style="width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.8rem;">
+                        JD
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btn-signout" title="Sign Out" style="background: rgba(255,255,255,0.15); color: #fff; border: none;">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Body: Sidebar + Content -->
+        <div class="dashboard-body">
+            <!-- Sidebar Backdrop for Mobile -->
+            <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+            <!-- Sidebar / Navigation -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-close-wrapper">
+                    <button id="mobile-menu-close" class="btn-icon">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-view="overview">
+                        <i class="fa-solid fa-chart-pie"></i> Action Overview
+                    </button>
+                    <button class="nav-item" data-view="meals">
+                        <i class="fa-solid fa-bowl-food"></i> Food Relief
+                    </button>
+                    <button class="nav-item" data-view="water">
+                        <i class="fa-solid fa-droplet"></i> Clean Water
+                    </button>
+                    <button class="nav-item" data-view="medical">
+                        <i class="fa-solid fa-kit-medical"></i> Medical
+                    </button>
+                    <button class="nav-item" data-view="shelter">
+                        <i class="fa-solid fa-tent"></i> Shelter &amp; Aid
+                    </button>
+                    <button class="nav-item" data-view="orphans">
+                        <i class="fa-solid fa-children"></i> Orphans
+                    </button>
+                    <button class="nav-item" data-view="export-studio">
+                        <i class="fa-solid fa-file-export"></i> Report Studio
+                    </button>
+                </nav>
+                
+                <div class="sidebar-cta">
+                    <a href="https://matwproject.org/gaza-emergency" target="_blank" class="btn btn-primary btn-cta">
+                        <i class="fa-solid fa-heart"></i> Support Gaza Appeal
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <div id="view-container" class="view-container">
+                    <!-- Content injected via JS -->
+                </div>
+                
+                <!-- Global Footer Banner (visible on all tabs) -->
+                <div id="global-footer" class="exec-footer-banner" style="border-radius: 16px; margin-top: 40px;">
+                    <div>
+                        <div class="exec-footer-tagline">ONE TEAM. ONE MISSION.</div>
+                        <div class="exec-footer-headline">Making a real difference, together.</div>
+                    </div>
+                    <div class="exec-footer-right">
+                        <a href="https://matwproject.org/gaza-emergency" target="_blank" class="exec-footer-cta">
+                            Support Gaza <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Respectful Cinematic Background -->
+    <div class="bg-image-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

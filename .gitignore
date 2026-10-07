@@ -1,0 +1,22 @@
+# Dependencies & runtime distributions
+node_modules/
+node-v20.17.0-win-x64/
+poppler-24.07.0/
+
+# Archives & temporary binaries
+*.zip
+*.tar.gz
+
+# Temporary scrape & extraction files
+matw_colors.txt
+matw_home.html
+pdf_output.txt
+Gaza Impact Report - 20th September 2026_261005_111015.pdf
+
+# Unused large duplicate assets
+src/assets/gaza_report.pdf
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.log

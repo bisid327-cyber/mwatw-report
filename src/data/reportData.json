@@ -1,0 +1,94 @@
+{
+    "keyMetrics": [
+        {
+            "id": "meals",
+            "title": "Hot Meals Distributed",
+            "icon": "fa-solid fa-bowl-food",
+            "value": "244,263",
+            "description": "Nutritious hot meals provided to families in crisis zones.",
+            "pageData": {
+                "title": "Emergency Food Relief",
+                "details": "MATW teams are on the ground daily cooking and distributing massive quantities of hot, nutritious meals to internally displaced families.",
+                "metrics": [
+                    { "label": "Family Hot Meals", "value": "244,263" },
+                    { "label": "Iftar Meals", "value": "43,500" },
+                    { "label": "Food Packs", "value": "12,480" },
+                    { "label": "Flour Bags", "value": "7,800" },
+                    { "label": "Baby Milk Tins", "value": "2,940" },
+                    { "label": "Vegetable Boxes", "value": "5,320" }
+                ]
+            }
+        },
+        {
+            "id": "water",
+            "title": "Clean Water Supplied",
+            "icon": "fa-solid fa-droplet",
+            "value": "1,284,000 L",
+            "description": "Safe drinking water trucked to emergency shelters.",
+            "pageData": {
+                "title": "Water & Sanitation",
+                "details": "With infrastructure destroyed, MATW is trucking in millions of liters of clean drinking water to prevent the spread of disease.",
+                "metrics": [
+                    { "label": "Liters Delivered", "value": "1,284,000" },
+                    { "label": "Water Wells Built", "value": "18" },
+                    { "label": "Hygiene Kits", "value": "80,000" }
+                ]
+            }
+        },
+        {
+            "id": "medical",
+            "title": "Medical & Mobility",
+            "icon": "fa-solid fa-kit-medical",
+            "value": "1,860 Kits",
+            "description": "Patients treated, mobility aids and medical kits delivered.",
+            "pageData": {
+                "title": "Healthcare & Mobility Support",
+                "details": "MATW is supplying overwhelmed hospitals with emergency medical kits, trauma supplies, wheelchairs, and prosthetic limbs.",
+                "metrics": [
+                    { "label": "Medical Kits", "value": "1,860" },
+                    { "label": "Baby Diapers", "value": "4,920 packs" },
+                    { "label": "Wheelchairs", "value": "86" },
+                    { "label": "Prosthetic Limbs", "value": "12" },
+                    { "label": "Crutches", "value": "240 pairs" },
+                    { "label": "Hospital Rebuild", "value": "1 project" }
+                ]
+            }
+        },
+        {
+            "id": "shelter",
+            "title": "Shelter & Winter Aid",
+            "icon": "fa-solid fa-tent",
+            "value": "14,800+",
+            "description": "Clothing, winter kits, blankets and tents for displaced families.",
+            "pageData": {
+                "title": "Shelter, Clothing & Winter Aid",
+                "details": "Warmth, shelter and household essentials for families facing the winter.",
+                "metrics": [
+                    { "label": "Clothing Items", "value": "14,800" },
+                    { "label": "Winter Kits (Children)", "value": "3,820" },
+                    { "label": "Winter Blankets", "value": "6,750" },
+                    { "label": "Mattresses", "value": "2,180" },
+                    { "label": "Tents", "value": "280" },
+                    { "label": "Tarpaulins", "value": "1,640" }
+                ]
+            }
+        },
+        {
+            "id": "orphans",
+            "title": "Orphan & Child Welfare",
+            "icon": "fa-solid fa-children",
+            "value": "420",
+            "description": "Direct financial and psychological support for orphaned children.",
+            "pageData": {
+                "title": "Orphan Support",
+                "details": "Ongoing care and practical support for children without parental care.",
+                "metrics": [
+                    { "label": "Children Supported", "value": "420" },
+                    { "label": "Family Care Grants", "value": "185" },
+                    { "label": "Gifts for Children", "value": "3,840" },
+                    { "label": "School Kits", "value": "1,260" }
+                ]
+            }
+        }
+    ]
+}
