@@ -3,8 +3,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. Fetch Report Data (default metrics template)
     let reportData = null;
     try {
-        const response = await fetch('../src/data/reportData.json');
-        if(!response.ok) throw new Error("Could not fetch data");
+        let response = await fetch('data/reportData.json').catch(() => null);
+        if (!response || !response.ok) {
+            response = await fetch('src/data/reportData.json').catch(() => null);
+        }
+        if (!response || !response.ok) {
+            response = await fetch('../src/data/reportData.json').catch(() => null);
+        }
+        if(!response || !response.ok) throw new Error("Could not fetch data");
         reportData = await response.json();
     } catch (e) {
         console.error("Using fallback data due to fetch error", e);
@@ -79,16 +85,315 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    // 2. LocalStorage & Cloud Report Management
+    // ──────────────────────────────────
+    // Modern Toast Notification System
+    // ──────────────────────────────────
+    function showToast(message, type = 'info', duration = 3500) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast-message toast-${type}`;
+        
+        let icon = 'fa-circle-info';
+        if (type === 'success') icon = 'fa-circle-check';
+        else if (type === 'warning') icon = 'fa-circle-exclamation';
+        else if (type === 'error') icon = 'fa-triangle-exclamation';
+        
+        toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+
+    // ──────────────────────────────────
+    // Modern Social Share Modal System
+    // ──────────────────────────────────
+    function openShareModal({ title, subtitle, url }) {
+        const modal = document.getElementById('share-modal');
+        if (!modal) return;
+        
+        const shareUrl = url || window.location.href;
+        const shareTitle = title || "MATW Project | Gaza Emergency Impact Report";
+        const shareText = (subtitle || "Explore verified humanitarian metrics and relief distributions in Gaza.") + " " + shareUrl;
+        
+        const titleEl = document.getElementById('share-modal-report-title');
+        const descEl = document.getElementById('share-modal-report-desc');
+        const linkInput = document.getElementById('share-link-input');
+        
+        if (titleEl) titleEl.textContent = shareTitle;
+        if (descEl) descEl.textContent = subtitle || "Verified humanitarian metrics and relief response data.";
+        if (linkInput) linkInput.value = shareUrl;
+        
+        // WhatsApp
+        const waBtn = document.getElementById('share-channel-whatsapp');
+        if (waBtn) waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + "\n" + shareText)}`;
+        
+        // X (Twitter)
+        const xBtn = document.getElementById('share-channel-x');
+        if (xBtn) xBtn.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}&hashtags=Gaza,MATWProject,HumanitarianAid`;
+        
+        // LinkedIn
+        const liBtn = document.getElementById('share-channel-linkedin');
+        if (liBtn) liBtn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+        
+        // Facebook
+        const fbBtn = document.getElementById('share-channel-facebook');
+        if (fbBtn) fbBtn.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+        
+        // Email
+        const emailBtn = document.getElementById('share-channel-email');
+        if (emailBtn) emailBtn.href = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(shareText)}`;
+        
+        // Native Mobile Web Share button
+        const nativeBtn = document.getElementById('share-native-btn');
+        if (nativeBtn) {
+            if (navigator.share) {
+                nativeBtn.style.display = 'flex';
+                nativeBtn.onclick = async () => {
+                    try {
+                        await navigator.share({
+                            title: shareTitle,
+                            text: subtitle || "MATW Project Gaza Emergency Impact Report",
+                            url: shareUrl
+                        });
+                        showToast('Shared successfully!', 'success');
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            copyToClipboard(shareUrl);
+                        }
+                    }
+                };
+            } else {
+                nativeBtn.style.display = 'none';
+            }
+        }
+        
+        // Copy button
+        const copyBtn = document.getElementById('share-copy-btn');
+        if (copyBtn) {
+            copyBtn.onclick = () => {
+                copyToClipboard(shareUrl);
+            };
+        }
+        
+        modal.style.display = 'flex';
+        gsap.fromTo(modal.querySelector('.modern-modal-card'), 
+            { scale: 0.9, opacity: 0 }, 
+            { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(1.5)" }
+        );
+    }
+
+    function closeShareModal() {
+        const modal = document.getElementById('share-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function copyToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                handleCopySuccess();
+            }).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            handleCopySuccess();
+        } catch (err) {
+            showToast('Could not copy link to clipboard', 'error');
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function handleCopySuccess() {
+        const copyBtn = document.getElementById('share-copy-btn');
+        if (copyBtn) {
+            const orig = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Copied!</span>';
+            copyBtn.style.background = '#10b981';
+            setTimeout(() => {
+                copyBtn.innerHTML = orig;
+                copyBtn.style.background = '';
+            }, 2000);
+        }
+        showToast('Report link copied to clipboard!', 'success');
+    }
+
+    // ──────────────────────────────────
+    // Export CSV Engine
+    // ──────────────────────────────────
+    function exportReportCsv(report) {
+        if (!report || !report.sections) {
+            showToast('No report data found to export', 'error');
+            return;
+        }
+        try {
+            let csv = "\uFEFFSection,Metric,Value\r\n";
+            const visibleSections = report.sections.filter(s => s.visible !== false);
+            let count = 0;
+            visibleSections.forEach(sec => {
+                const metrics = (sec.metrics || []).filter(m => m.visible !== false);
+                metrics.forEach(m => {
+                    const cleanSec = String(sec.title || '').replace(/"/g, '""');
+                    const cleanLabel = String(m.label || '').replace(/"/g, '""');
+                    const cleanValue = String(m.value || '').replace(/"/g, '""');
+                    csv += `"${cleanSec}","${cleanLabel}","${cleanValue}"\r\n`;
+                    count++;
+                });
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            const safeTitle = (report.title || 'Report').replace(/[^a-z0-9]/gi, '_');
+            link.setAttribute("download", `${safeTitle}_Impact_Data.csv`);
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 200);
+            
+            showToast(`CSV Export Complete: ${count} metrics downloaded!`, 'success');
+        } catch (err) {
+            console.error("CSV Export error:", err);
+            showToast('Failed to export CSV. Please try again.', 'error');
+        }
+    }
+
+    // ──────────────────────────────────
+    // Export PDF Engine
+    // ──────────────────────────────────
+    function exportReportPdf(report, btnElement) {
+        const el = document.getElementById('report-printable');
+        if (!el) {
+            showToast('Printable report container not found', 'error');
+            return;
+        }
+        
+        let origHtml = '';
+        if (btnElement) {
+            origHtml = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Preparing PDF...</span>';
+        }
+        showToast('Generating high-resolution PDF document...', 'info', 4000);
+        
+        const safeTitle = (report.title || 'Impact_Report').replace(/[^a-z0-9]/gi, '_');
+        const opt = {
+            margin: [0.3, 0.3, 0.4, 0.3],
+            filename: `${safeTitle}_MATW_Report.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 1.5, 
+                useCORS: true, 
+                allowTaint: true,
+                logging: false,
+                backgroundColor: '#0d273a'
+            },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        if (typeof html2pdf !== 'undefined') {
+            html2pdf().set(opt).from(el).save().then(() => {
+                if (btnElement) {
+                    btnElement.innerHTML = '<i class="fa-solid fa-check"></i> <span>PDF Saved!</span>';
+                    setTimeout(() => {
+                        btnElement.innerHTML = origHtml;
+                        btnElement.disabled = false;
+                    }, 2500);
+                }
+                showToast('PDF downloaded successfully!', 'success');
+            }).catch((err) => {
+                console.error("html2pdf failed:", err);
+                fallbackPrintPdf(btnElement, origHtml);
+            });
+        } else {
+            fallbackPrintPdf(btnElement, origHtml);
+        }
+    }
+
+    function fallbackPrintPdf(btnElement, origHtml) {
+        showToast('Direct download issue — opening print-to-PDF view...', 'info');
+        window.print();
+        if (btnElement) {
+            btnElement.innerHTML = origHtml;
+            btnElement.disabled = false;
+        }
+    }
+
+    // ──────────────────────────────────
+    // LocalStorage & Cloud Report Management
+    // ──────────────────────────────────
     let currentUser = null;
     let authHeader = '';
 
+    function createDefaultOfficialReport() {
+        const sections = (reportData && reportData.keyMetrics ? reportData.keyMetrics : []).map((m, i) => ({
+            id: m.id || ('sec_' + i),
+            title: m.pageData ? m.pageData.title : m.title,
+            iconImage: '',
+            visible: true,
+            metrics: (m.pageData && m.pageData.metrics ? m.pageData.metrics : [{ label: m.title, value: m.value }]).map(met => ({
+                label: met.label,
+                value: met.value,
+                visible: true
+            }))
+        }));
+
+        return {
+            id: 'rpt_gaza_official_2026',
+            title: 'Gaza Emergency Impact Report',
+            subtitle: '20 Days of Verified Relief & Humanitarian Operations',
+            startDate: '2026-09-01',
+            endDate: '2026-09-20',
+            introduction: 'In response to unprecedented humanitarian devastation across the Gaza Strip, MATW teams and localized partner networks have mobilized continuous emergency operations to sustain displaced civilians.',
+            font: 'Montserrat',
+            status: 'Published',
+            bgImage: '',
+            logoImage: 'assets/matw_logo.png',
+            sections: sections,
+            createdAt: '2026-09-20T08:00:00.000Z',
+            updatedAt: '2026-09-20T12:00:00.000Z'
+        };
+    }
+
     function getReports() {
-        try { return JSON.parse(localStorage.getItem('matw_reports') || '[]'); } catch { return []; }
+        try {
+            const stored = localStorage.getItem('matw_reports');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch (e) {
+            console.error("Error reading localStorage", e);
+        }
+        
+        // Seed default official report so Report Studio has rich data immediately
+        const def = createDefaultOfficialReport();
+        try {
+            localStorage.setItem('matw_reports', JSON.stringify([def]));
+        } catch(e) {}
+        return [def];
     }
     
     function saveReports(reports) {
-        // Always save locally
         localStorage.setItem('matw_reports', JSON.stringify(reports));
         
         // Sync to cloud if authenticated
@@ -122,10 +427,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         let gridHtml = `
             <div class="bento-grid">
                 <div class="bento-card slider-card" style="cursor: default;">
-                    <div class="image-slide active" style="background-image: url('../assets/charity_1.jpg');"></div>
-                    <div class="image-slide" style="background-image: url('../assets/charity_2.jpg');"></div>
-                    <div class="image-slide" style="background-image: url('../assets/charity_3.jpg');"></div>
-                    <div class="image-slide" style="background-image: url('../assets/charity_4.jpg');"></div>
+                    <div class="image-slide active" style="background-image: url('assets/charity_1.jpg');"></div>
+                    <div class="image-slide" style="background-image: url('assets/charity_2.jpg');"></div>
+                    <div class="image-slide" style="background-image: url('assets/charity_3.jpg');"></div>
+                    <div class="image-slide" style="background-image: url('assets/charity_4.jpg');"></div>
                     <div class="slider-overlay">
                         <h3>MATW Emergency Appeal</h3>
                         <p>Providing critical relief on the ground.</p>
@@ -219,7 +524,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="report-card" data-rpt-id="${r.id}">
                     <div class="report-card-top">
                         <span class="report-status ${r.status === 'Published' ? 'published' : 'draft'}">${r.status}</span>
-                        <button class="report-delete-btn" data-del-id="${r.id}" title="Delete">
+                        <button class="report-delete-btn" data-del-id="${r.id}" title="Delete Report">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -229,11 +534,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span><i class="fa-solid fa-calendar"></i> ${r.startDate || '—'} → ${r.endDate || '—'}</span>
                     </div>
                     <div class="report-card-actions">
-                        <button class="btn btn-primary btn-sm" data-view-id="${r.id}">
+                        <button class="btn btn-primary btn-sm" data-view-id="${r.id}" title="View interactive report">
                             <i class="fa-solid fa-eye"></i> View
                         </button>
-                        <button class="btn btn-secondary btn-sm" data-edit-id="${r.id}">
+                        <button class="btn btn-secondary btn-sm" data-edit-id="${r.id}" title="Edit report details">
                             <i class="fa-solid fa-pen"></i> Edit
+                        </button>
+                    </div>
+                    <div class="report-card-quick-bar">
+                        <button class="btn-quick" data-share-id="${r.id}" title="Share this report">
+                            <i class="fa-solid fa-share-nodes"></i> Share
+                        </button>
+                        <button class="btn-quick" data-pdf-id="${r.id}" title="Export as PDF">
+                            <i class="fa-solid fa-file-pdf"></i> PDF
+                        </button>
+                        <button class="btn-quick" data-csv-id="${r.id}" title="Export metrics as CSV">
+                            <i class="fa-solid fa-file-csv"></i> CSV
                         </button>
                     </div>
                 </div>
@@ -244,7 +560,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="studio-header">
                 <div>
                     <h3><i class="fa-solid fa-file-lines"></i> Impact Reports</h3>
-                    <p>Create, manage and export polished impact reports.</p>
+                    <p>Create, manage, export and share executive humanitarian reports.</p>
                 </div>
                 <button class="btn btn-primary" id="btn-new-report">
                     <i class="fa-solid fa-plus"></i> New Report
@@ -261,20 +577,38 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <h4 style="font-size: var(--text-xl); font-family: 'Montserrat', sans-serif; margin-bottom: 4px;">Palestine Impact Report 2026</h4>
                         <p style="color: var(--text-secondary); font-size: var(--text-sm);">The comprehensive 17-page official impact summary document detailing the ongoing efforts and allocations in Gaza.</p>
                     </div>
-                    <div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         <a href="assets/Palestine_Impact_Report_2026.pdf" target="_blank" class="btn btn-primary" style="text-decoration: none;">
                             <i class="fa-solid fa-download"></i> Download Full PDF
                         </a>
+                        <button class="btn btn-secondary" id="btn-share-official-pub">
+                            <i class="fa-solid fa-share-nodes"></i> Share
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <h4 style="font-family: 'Montserrat', sans-serif; font-size: var(--text-lg); margin-bottom: var(--space-4); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-color); color: var(--text-primary);">Your Custom Reports</h4>
+            <h4 style="font-family: 'Montserrat', sans-serif; font-size: var(--text-lg); margin-bottom: var(--space-4); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-color); color: var(--text-primary);">Interactive Reports</h4>
             <div class="report-cards-grid">${cardsHtml}</div>
         `;
 
         // Event Listeners
-        document.getElementById('btn-new-report').addEventListener('click', () => renderReportBuilder(null));
+        document.getElementById('btn-new-report').addEventListener('click', () => {
+            renderReportBuilder(null);
+            viewContainer.scrollTop = 0;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        const shareOfficialBtn = document.getElementById('btn-share-official-pub');
+        if (shareOfficialBtn) {
+            shareOfficialBtn.addEventListener('click', () => {
+                openShareModal({
+                    title: "Palestine Impact Report 2026",
+                    subtitle: "Official 17-page comprehensive Gaza emergency response report.",
+                    url: window.location.origin + '/assets/Palestine_Impact_Report_2026.pdf'
+                });
+            });
+        }
 
         document.querySelectorAll('[data-view-id]').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -286,6 +620,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 renderReportBuilder(e.currentTarget.dataset.editId);
+                viewContainer.scrollTop = 0;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+        document.querySelectorAll('[data-share-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const r = getReports().find(rep => rep.id === e.currentTarget.dataset.shareId);
+                if (r) {
+                    openShareModal({
+                        title: r.title,
+                        subtitle: r.subtitle,
+                        url: window.location.href
+                    });
+                }
+            });
+        });
+        document.querySelectorAll('[data-pdf-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const rId = e.currentTarget.dataset.pdfId;
+                renderReportViewer(rId);
+                setTimeout(() => {
+                    const pdfBtn = document.getElementById('vw-pdf');
+                    const rep = getReports().find(r => r.id === rId);
+                    if (rep) exportReportPdf(rep, pdfBtn);
+                }, 300);
+            });
+        });
+        document.querySelectorAll('[data-csv-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const r = getReports().find(rep => rep.id === e.currentTarget.dataset.csvId);
+                if (r) exportReportCsv(r);
             });
         });
         document.querySelectorAll('[data-del-id]').forEach(btn => {
@@ -294,6 +662,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const id = e.currentTarget.dataset.delId;
                 if (confirm('Delete this report permanently?')) {
                     saveReports(getReports().filter(r => r.id !== id));
+                    showToast('Report deleted.', 'info');
                     renderReportList();
                 }
             });
@@ -304,32 +673,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3B. Report Builder (Create / Edit)
     function renderReportBuilder(editId) {
+        if(document.getElementById('global-footer')) document.getElementById('global-footer').style.display = 'flex';
         if (sliderInterval) clearInterval(sliderInterval);
         const existing = editId ? getReports().find(r => r.id === editId) : null;
 
-        const title = existing ? existing.title : 'Gaza Impact Report';
-        const subtitle = existing ? existing.subtitle : '20 days of focused support';
+        const title = existing ? existing.title : 'Gaza Emergency Impact Report';
+        const subtitle = existing ? existing.subtitle : '20 Days of Verified Relief Operations';
         const startDate = existing ? existing.startDate : '2026-09-01';
         const endDate = existing ? existing.endDate : '2026-09-20';
-        const intro = existing ? existing.introduction : 'Together with our local partners, we are helping families access food, clean water, medical support and a safer place to call home.';
+        const intro = existing ? existing.introduction : 'In response to unprecedented humanitarian devastation across the Gaza Strip, MATW teams and localized partner networks have mobilized continuous emergency operations to sustain displaced civilians.';
         const font = existing ? existing.font : 'Montserrat';
         const status = existing ? existing.status : 'Draft';
         let bgImage = existing && existing.bgImage ? existing.bgImage : '';
         let logoImage = existing && existing.logoImage ? existing.logoImage : '';
 
         // Build section editors
-        const sections = existing ? existing.sections : reportData.keyMetrics.map((m, i) => ({
-            id: m.id,
-            title: m.pageData.title,
+        const sections = existing ? existing.sections : (reportData && reportData.keyMetrics ? reportData.keyMetrics.map((m, i) => ({
+            id: m.id || ('sec_' + i),
+            title: m.pageData ? m.pageData.title : m.title,
             visible: true,
-            metrics: m.pageData.metrics.map(met => ({ ...met, visible: true }))
-        }));
+            iconImage: '',
+            metrics: (m.pageData && m.pageData.metrics ? m.pageData.metrics : [{ label: m.title, value: m.value }]).map(met => ({ ...met, visible: true }))
+        })) : []);
 
         let sectionsHtml = sections.map((sec, si) => {
             let metricsRows = sec.metrics.map((met, mi) => `
                 <div class="builder-metric-row">
-                    <input type="text" class="builder-input builder-input-sm" value="${met.label}" data-sec="${si}" data-met="${mi}" data-field="label">
-                    <input type="text" class="builder-input builder-input-sm" value="${met.value}" data-sec="${si}" data-met="${mi}" data-field="value">
+                    <input type="text" class="builder-input builder-input-sm" value="${met.label}" data-sec="${si}" data-met="${mi}" data-field="label" placeholder="Metric label">
+                    <input type="text" class="builder-input builder-input-sm" value="${met.value}" data-sec="${si}" data-met="${mi}" data-field="value" placeholder="Value">
                 </div>
             `).join('');
             return `
@@ -441,9 +812,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
 
+        // Scroll to top
+        viewContainer.scrollTop = 0;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
         // Setup Drag and Drop
         function setupDropZone(elId, onFile) {
             const el = document.getElementById(elId);
+            if (!el) return;
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
                 el.addEventListener(evt, e => {
                     e.preventDefault();
@@ -488,7 +864,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const secVisible = secEl.querySelector('[data-field="sec-visible"]').checked;
                 const metricEls = secEl.querySelectorAll('.builder-metric-row');
                 const mets = [];
-                metricEls.forEach((metEl, mi) => {
+                metricEls.forEach((metEl) => {
                     mets.push({
                         label: metEl.querySelector('[data-field="label"]').value,
                         value: metEl.querySelector('[data-field="value"]').value,
@@ -533,28 +909,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('btn-back-list').addEventListener('click', () => renderReportList());
         document.getElementById('btn-save-report').addEventListener('click', () => {
             saveReport();
+            showToast('Report updated and saved!', 'success');
             renderReportList();
         });
         document.getElementById('btn-save-preview').addEventListener('click', () => {
             const data = saveReport();
+            showToast('Report saved! Live preview ready.', 'success');
             renderReportViewer(data.id);
         });
     }
 
+    // ──────────────────────────────────
     // 3C. Report Viewer — Premium Executive Report
+    // ──────────────────────────────────
     function renderReportViewer(reportId) {
         if(document.getElementById('global-footer')) document.getElementById('global-footer').style.display = 'none';
         if (sliderInterval) clearInterval(sliderInterval);
         const report = getReports().find(r => r.id === reportId);
-        if (!report) { renderReportList(); return; }
+        if (!report) { 
+            showToast('Report not found', 'error');
+            renderReportList(); 
+            return; 
+        }
 
-        const visibleSections = report.sections.filter(s => s.visible);
+        const visibleSections = report.sections.filter(s => s.visible !== false);
 
         // Calculate total metrics for the hero strip
         let totalItems = 0;
         let totalSections = visibleSections.length;
         visibleSections.forEach(sec => {
-            sec.metrics.forEach(m => {
+            (sec.metrics || []).forEach(m => {
                 const num = parseInt(String(m.value).replace(/[^0-9]/g, ''));
                 if (!isNaN(num)) totalItems += num;
             });
@@ -562,7 +946,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Build hero KPI strip from first metric of each section
         let heroKpis = visibleSections.slice(0, 4).map((sec, i) => {
-            const leadMetric = sec.metrics[0];
+            const leadMetric = sec.metrics && sec.metrics[0];
             const colors = ['#0097D0', '#0373B3', '#074B96', '#e91e63'];
             const icons = ['fa-chart-line', 'fa-arrow-trend-up', 'fa-chart-bar', 'fa-chart-pie'];
             const accent = colors[i % 4];
@@ -578,7 +962,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="exec-kpi-footer">
                             <span class="exec-kpi-section">${sec.title}</span>
                             <span class="exec-kpi-trend">
-                                <i class="fa-solid fa-arrow-up"></i> ${sec.metrics.length} metrics
+                                <i class="fa-solid fa-arrow-up"></i> ${sec.metrics ? sec.metrics.length : 0} metrics
                             </span>
                         </div>
                     </div>
@@ -588,7 +972,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Build detailed section blocks
         let sectionsHtml = visibleSections.map((sec, si) => {
-            let tableRows = sec.metrics.filter(m => m.visible !== false).map((m, mi) => `
+            let tableRows = (sec.metrics || []).filter(m => m.visible !== false).map((m, mi) => `
                 <tr class="exec-table-row" style="--index: ${mi};">
                     <td class="exec-td-label">
                         <span class="exec-row-dot"></span>
@@ -607,7 +991,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                         <div>
                             <h4 class="exec-section-title">${sec.title}</h4>
-                            <p class="exec-section-count">${sec.metrics.length} metrics tracked</p>
+                            <p class="exec-section-count">${sec.metrics ? sec.metrics.length : 0} metrics tracked</p>
                         </div>
                     </div>
                     <table class="exec-table">
@@ -624,10 +1008,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
 
         // Summary footer stats
-        const totalMetricCount = visibleSections.reduce((a, s) => a + s.metrics.length, 0);
-
+        const totalMetricCount = visibleSections.reduce((a, s) => a + (s.metrics ? s.metrics.length : 0), 0);
 
         viewContainer.innerHTML = `
+            <!-- Top Sticky Action Bar (Instant access on desktop & mobile) -->
+            <div class="viewer-action-bar-top">
+                <div class="viewer-bar-left">
+                    <button class="btn btn-secondary btn-sm" id="vw-back" title="Return to Report List">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </button>
+                    <div class="viewer-bar-info">
+                        <span class="viewer-status-badge ${report.status === 'Published' ? 'published' : 'draft'}">${report.status}</span>
+                        <span class="viewer-title-chip" title="${report.title}">${report.title}</span>
+                    </div>
+                </div>
+                <div class="viewer-actions-group">
+                    <button class="btn btn-primary btn-sm btn-action-pdf" id="vw-pdf" title="Export report as print-ready PDF">
+                        <i class="fa-solid fa-file-pdf"></i> <span>Export PDF</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm btn-action-csv" id="vw-csv" title="Download all report data as CSV">
+                        <i class="fa-solid fa-file-csv"></i> <span>CSV</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm btn-action-share" id="vw-share" title="Share via WhatsApp, Social & Direct Link">
+                        <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm btn-action-edit" id="vw-edit" title="Edit this report">
+                        <i class="fa-solid fa-pen"></i> <span>Edit</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="exec-report" id="report-printable" style="font-family: '${report.font}', sans-serif;">
                 <!-- Branded Header Banner -->
                 <div class="exec-hero-banner">
@@ -677,72 +1087,86 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
 
-            <!-- Sticky Action Bar -->
+            <!-- Bottom Action Dock -->
             <div class="viewer-action-bar">
-                <button class="btn btn-secondary btn-sm" id="vw-back">
-                    <i class="fa-solid fa-arrow-left"></i> Back
+                <button class="btn btn-secondary btn-sm" id="vw-back-bottom">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Reports
                 </button>
                 <div style="display:flex; gap: var(--space-2); flex-wrap: wrap;">
-                    <button class="btn btn-primary btn-sm" id="vw-pdf">
+                    <button class="btn btn-primary btn-sm btn-action-pdf" id="vw-pdf-bottom">
                         <i class="fa-solid fa-file-pdf"></i> Export PDF
                     </button>
-                    <button class="btn btn-secondary btn-sm" id="vw-csv">
+                    <button class="btn btn-secondary btn-sm btn-action-csv" id="vw-csv-bottom">
                         <i class="fa-solid fa-file-csv"></i> CSV
                     </button>
-                    <button class="btn btn-secondary btn-sm" id="vw-share">
-                        <i class="fa-solid fa-link"></i> Share
+                    <button class="btn btn-secondary btn-sm btn-action-share" id="vw-share-bottom">
+                        <i class="fa-solid fa-share-nodes"></i> Share
                     </button>
-                    <button class="btn btn-secondary btn-sm" id="vw-edit">
+                    <button class="btn btn-secondary btn-sm btn-action-edit" id="vw-edit-bottom">
                         <i class="fa-solid fa-pen"></i> Edit
                     </button>
                 </div>
             </div>
         `;
 
+        // Scroll to top
+        viewContainer.scrollTop = 0;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
         // Staggered entrance animations
         gsap.from(".exec-kpi", { y: 30, opacity: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.4)" });
         gsap.from(".exec-section", { y: 20, opacity: 0, duration: 0.5, stagger: 0.12, delay: 0.3, ease: "power2.out" });
 
-        // Export PDF
-        document.getElementById('vw-pdf').addEventListener('click', () => {
-            const el = document.getElementById('report-printable');
-            html2pdf().set({
-                margin: 0.5,
-                filename: report.title.replace(/[^a-z0-9]/gi, '_') + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a0a0a' },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            }).from(el).save();
-        });
-
-        // Export CSV
-        document.getElementById('vw-csv').addEventListener('click', () => {
-            let csv = "Section,Metric,Value\n";
-            report.sections.filter(s => s.visible).forEach(sec => {
-                sec.metrics.forEach(m => {
-                    csv += `"${sec.title}","${m.label}","${m.value}"\n`;
-                });
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = report.title.replace(/[^a-z0-9]/gi, '_') + '.csv';
-            link.click();
-        });
-
-        // Share Link
-        document.getElementById('vw-share').addEventListener('click', (e) => {
-            navigator.clipboard.writeText(window.location.href);
+        // Wire Up PDF Export (Top and Bottom)
+        const pdfHandler = (e) => {
             const btn = e.currentTarget;
-            const orig = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-            setTimeout(() => btn.innerHTML = orig, 2000);
-        });
+            exportReportPdf(report, btn);
+        };
+        const pdfTop = document.getElementById('vw-pdf');
+        const pdfBottom = document.getElementById('vw-pdf-bottom');
+        if (pdfTop) pdfTop.addEventListener('click', pdfHandler);
+        if (pdfBottom) pdfBottom.addEventListener('click', pdfHandler);
 
-        document.getElementById('vw-back').addEventListener('click', () => renderReportList());
-        document.getElementById('vw-edit').addEventListener('click', () => renderReportBuilder(reportId));
+        // Wire Up CSV Export (Top and Bottom)
+        const csvHandler = () => {
+            exportReportCsv(report);
+        };
+        const csvTop = document.getElementById('vw-csv');
+        const csvBottom = document.getElementById('vw-csv-bottom');
+        if (csvTop) csvTop.addEventListener('click', csvHandler);
+        if (csvBottom) csvBottom.addEventListener('click', csvHandler);
+
+        // Wire Up Share Modal (Top and Bottom)
+        const shareHandler = () => {
+            openShareModal({
+                title: report.title,
+                subtitle: report.subtitle,
+                url: window.location.href
+            });
+        };
+        const shareTop = document.getElementById('vw-share');
+        const shareBottom = document.getElementById('vw-share-bottom');
+        if (shareTop) shareTop.addEventListener('click', shareHandler);
+        if (shareBottom) shareBottom.addEventListener('click', shareHandler);
+
+        // Wire Up Edit (Top and Bottom)
+        const editHandler = () => {
+            renderReportBuilder(reportId);
+            viewContainer.scrollTop = 0;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        const editTop = document.getElementById('vw-edit');
+        const editBottom = document.getElementById('vw-edit-bottom');
+        if (editTop) editTop.addEventListener('click', editHandler);
+        if (editBottom) editBottom.addEventListener('click', editHandler);
+
+        // Wire Up Back (Top and Bottom)
+        const backHandler = () => renderReportList();
+        const backTop = document.getElementById('vw-back');
+        const backBottom = document.getElementById('vw-back-bottom');
+        if (backTop) backTop.addEventListener('click', backHandler);
+        if (backBottom) backBottom.addEventListener('click', backHandler);
     }
-
 
     // ──────────────────────────────────
     // Legal Pages
@@ -870,6 +1294,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 } catch(e) {
                     console.error(e);
+                    showToast('Network error during login', 'error');
                 }
             });
         } else {
@@ -878,7 +1303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const email = document.getElementById('signup-email').value;
                 const password = document.getElementById('signup-password').value;
                 const agree = document.getElementById('signup-agree').checked;
-                if (!agree) return alert("Please agree to the Terms of Service.");
+                if (!agree) return showToast("Please agree to the Terms of Service.", 'warning');
                 
                 try {
                     const res = await fetch('/api/signup', {
@@ -888,8 +1313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                     const data = await res.json();
                     if (res.ok) {
-                        // Switch back to login
-                        alert("Account created! Please sign in.");
+                        showToast("Account created successfully! Please sign in.", 'success');
                         renderAuthView(true);
                     } else {
                         document.getElementById('signup-error').innerText = data.error;
@@ -897,6 +1321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 } catch(e) {
                     console.error(e);
+                    showToast('Network error during account creation', 'error');
                 }
             });
         }
@@ -905,6 +1330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleLoginSuccess(user, token) {
         currentUser = user;
         authHeader = `Bearer ${token}`;
+        showToast(`Welcome back, ${user.name}!`, 'success');
         
         // Fetch cloud reports and merge
         try {
@@ -914,13 +1340,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (res.ok) {
                 const data = await res.json();
                 if (data.reports) {
-                    // Merge logic: prefer cloud if IDs match, else append
                     let localReports = getReports();
                     let localMap = new Map(localReports.map(r => [r.id, r]));
                     data.reports.forEach(cr => {
                         localMap.set(cr.id, cr);
                     });
-                    saveReports(Array.from(localMap.values())); // Save back combined list locally and cloud
+                    saveReports(Array.from(localMap.values()));
                 }
             }
         } catch(e) {
@@ -928,7 +1353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         updateAuthUI();
-        renderOverview(); // Return to dashboard
+        renderOverview();
     }
 
     function updateAuthUI() {
@@ -956,7 +1381,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentUser = null;
         authHeader = '';
         updateAuthUI();
+        showToast('Signed out of MATW account.', 'info');
         renderOverview();
+    });
+
+    // Global Top Nav Share Button
+    const btnGlobalShare = document.getElementById('btn-global-share');
+    if (btnGlobalShare) {
+        btnGlobalShare.addEventListener('click', () => {
+            openShareModal({
+                title: "MATW Project | Gaza Emergency Impact Report",
+                subtitle: "Interactive emergency relief dashboard & verified field metrics in Gaza.",
+                url: window.location.href
+            });
+        });
+    }
+
+    // Modal Close Button & Backdrop Click Handlers
+    const shareModalClose = document.getElementById('share-modal-close');
+    const shareModal = document.getElementById('share-modal');
+    if (shareModalClose) shareModalClose.addEventListener('click', closeShareModal);
+    if (shareModal) {
+        shareModal.addEventListener('click', (e) => {
+            if (e.target === shareModal) closeShareModal();
+        });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeShareModal();
     });
 
     // ──────────────────────────────────

@@ -53,9 +53,14 @@
                 </div>
             </div>
             <div class="auth-section" id="auth-section">
-                <button class="btn-nav-auth" id="btn-open-auth">
-                    <i class="fa-solid fa-user"></i> Sign In
-                </button>
+                <div class="top-nav-actions">
+                    <button class="btn-nav-share" id="btn-global-share" title="Share Report">
+                        <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+                    </button>
+                    <button class="btn-nav-auth" id="btn-open-auth">
+                        <i class="fa-solid fa-user"></i> Sign In
+                    </button>
+                </div>
                 <!-- Logged in state (Hidden initially) -->
                 <div id="user-profile-menu" style="display: none; align-items: center; gap: var(--space-3);">
                     <div style="text-align: right;">
@@ -139,6 +144,69 @@
 
     <!-- Respectful Cinematic Background -->
     <div class="bg-image-container"></div>
+
+        <!-- Global Modern Toast Notification Container -->
+    <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+
+    <!-- Global Modern Social Share Modal -->
+    <div id="share-modal" class="modern-modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+        <div class="modern-modal-card">
+            <div class="modal-header">
+                <div class="modal-header-title">
+                    <i class="fa-solid fa-share-nodes"></i>
+                    <h3 id="share-modal-title">Share Impact Report</h3>
+                </div>
+                <button class="modal-close-btn" id="share-modal-close" aria-label="Close share dialog">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="share-preview-card">
+                <div class="share-preview-badge">LIVE IMPACT REPORT</div>
+                <h4 id="share-modal-report-title">Gaza Emergency Impact Report</h4>
+                <p id="share-modal-report-desc">Verified humanitarian metrics and relief response data.</p>
+            </div>
+
+            <!-- Native Device Share Button (iOS, Android, Windows) -->
+            <button class="btn btn-primary share-native-btn" id="share-native-btn" style="width: 100%; margin-bottom: 16px; border-radius: 10px; font-weight: 600;">
+                <i class="fa-solid fa-arrow-up-from-bracket"></i> Share via Device Sheet
+            </button>
+
+            <!-- Social Media Channels Grid -->
+            <label class="share-label">Share Directly</label>
+            <div class="share-channels-grid">
+                <a href="#" class="share-channel-btn share-whatsapp" id="share-channel-whatsapp" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </a>
+                <a href="#" class="share-channel-btn share-x" id="share-channel-x" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-x-twitter"></i>
+                    <span>X</span>
+                </a>
+                <a href="#" class="share-channel-btn share-linkedin" id="share-channel-linkedin" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="#" class="share-channel-btn share-facebook" id="share-channel-facebook" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </a>
+                <a href="#" class="share-channel-btn share-email" id="share-channel-email">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>Email</span>
+                </a>
+            </div>
+
+            <!-- Direct Link Copy Field -->
+            <label class="share-label">Report Link</label>
+            <div class="share-copy-row">
+                <input type="text" id="share-link-input" readonly class="share-input">
+                <button class="btn btn-primary" id="share-copy-btn">
+                    <i class="fa-solid fa-copy"></i> <span>Copy</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
