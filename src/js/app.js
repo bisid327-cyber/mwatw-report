@@ -219,14 +219,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const copyBtn = document.getElementById('share-copy-btn');
         if (copyBtn) {
             const orig = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Copied!</span>';
-            copyBtn.style.background = '#10b981';
+            copyBtn.innerHTML = 'Copied';
+            copyBtn.classList.add('copied');
             setTimeout(() => {
                 copyBtn.innerHTML = orig;
-                copyBtn.style.background = '';
+                copyBtn.classList.remove('copied');
             }, 2000);
         }
-        showToast('Report link copied to clipboard!', 'success');
     }
 
     // ──────────────────────────────────
