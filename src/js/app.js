@@ -987,8 +987,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sectionIcons = { meals: 'fa-bowl-food', water: 'fa-droplet', medical: 'fa-kit-medical', shelter: 'fa-tent', orphans: 'fa-children' };
             const accent = colors[i % 4];
             return `
-                <div class="exec-kpi" style="--kpi-accent: ${accent};">
-                    <div class="exec-kpi-accent"></div>
+                <div class="exec-kpi">
                     <div class="exec-kpi-body">
                         <div class="exec-kpi-top">
                             <span class="exec-kpi-label">${leadMetric ? leadMetric.label : sec.title}</span>

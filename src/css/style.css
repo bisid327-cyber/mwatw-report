@@ -1167,12 +1167,12 @@ textarea.builder-input {
   font-style: italic;
 }
 
-/* Hero KPI Strip — Modern Analytics Cards */
+/* Hero KPI Strip — Enterprise Analytics Cards */
 .exec-kpi-strip {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-8);
+  gap: 12px;
+  margin-bottom: var(--space-6);
   position: relative;
   z-index: 1;
 }
@@ -1181,93 +1181,96 @@ textarea.builder-input {
   position: relative;
   background: var(--surface-color);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 8px;
   display: flex;
   flex-direction: row;
   overflow: hidden;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.25s ease;
+  transition: border-color 0.15s ease;
 }
 .exec-kpi:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-color: rgba(3, 115, 179, 0.3);
 }
 
 .exec-kpi-accent {
-  width: 4px;
-  flex-shrink: 0;
-  background: var(--kpi-accent);
-  border-radius: 4px 0 0 4px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .exec-kpi-body {
-  padding: 16px 18px;
+  padding: 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .exec-kpi-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
 
 .exec-kpi-label {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .exec-kpi-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--kpi-accent) 12%, transparent);
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--kpi-accent);
-  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  opacity: 0.5;
 }
 
 .exec-kpi-value { font-variant-numeric: tabular-nums;
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.02em;
-  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+  font-weight: 600;
   color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 2px 0;
 }
 
 .exec-kpi-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto;
+  margin-top: 4px;
   padding-top: 8px;
   border-top: 1px solid var(--border-color);
 }
 
 .exec-kpi-section {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 500;
   flex: 1;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .exec-kpi-trend {
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.6875rem;
+  font-weight: 500;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 3px;
+  white-space: nowrap;
 }
 .exec-kpi-trend i {
   font-size: 0.6rem;
@@ -2836,15 +2839,15 @@ textarea.builder-input { min-height: 112px; }
 .builder-actions { padding: 16px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; }
 .drop-zone { border-color: var(--text-secondary); }
 
-.exec-kpi { box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-.exec-kpi:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-.exec-kpi-body { min-width: 0; padding: 22px; gap: 16px; }
-.exec-kpi-top { gap: 12px; align-items: flex-start; }
-.exec-kpi-label { font-size: 0.8125rem; letter-spacing: 0.025em; }
+.exec-kpi { box-shadow: none; }
+.exec-kpi:hover { transform: none; box-shadow: none; }
+.exec-kpi-body { min-width: 0; }
+.exec-kpi-top { align-items: center; }
+.exec-kpi-label { font-size: 0.6875rem; letter-spacing: 0.06em; }
 .exec-kpi-icon { flex-shrink: 0; }
-.exec-kpi-value { font-variant-numeric: tabular-nums; font-size: var(--text-4xl); font-weight: 700; letter-spacing: -0.02em; overflow-wrap: anywhere; }
-.exec-kpi-footer { gap: 12px; align-items: flex-start; padding-top: 12px; }
-.exec-kpi-section, .exec-kpi-trend { font-size: 0.75rem; }
+.exec-kpi-value { font-variant-numeric: tabular-nums; font-size: clamp(1.5rem, 2.5vw, 1.875rem); font-weight: 600; letter-spacing: -0.025em; overflow-wrap: anywhere; }
+.exec-kpi-footer { gap: 8px; align-items: center; padding-top: 8px; }
+.exec-kpi-section, .exec-kpi-trend { font-size: 0.6875rem; }
 .exec-kpi-trend { white-space: nowrap; }
 .exec-section-num { color: var(--matw-cyan); font-size: 1.5rem; min-width: 36px; }
 .exec-section-icon { width: 44px; height: 44px; flex-shrink: 0; }
