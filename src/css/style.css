@@ -2759,7 +2759,7 @@ button, a, input, select, textarea, [tabindex] { scroll-margin-block: 100px; }
 }
 h1, h2, h3, h4 { text-wrap: balance; }
 .top-nav-date { color: #ffffff; font-size: 0.75rem; }
-.top-nav-titles { padding: 4px 10px; border-radius: 6px; background: rgba(18,52,74,0.35); }
+.top-nav-titles { padding: 4px 10px; border-radius: 6px; }
 .top-nav-hamburger { color: #ffffff; }
 .top-nav-left, .top-nav-titles { min-width: 0; }
 .top-nav-actions { flex-shrink: 0; }
