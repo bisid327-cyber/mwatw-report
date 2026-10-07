@@ -1453,6 +1453,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(menuClose) menuClose.addEventListener('click', closeMobileMenu);
     if(backdrop) backdrop.addEventListener('click', closeMobileMenu);
 
+    // ──────────────────────────────────
+    // Universal Button Click Feedback
+    // ──────────────────────────────────
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('button, .btn, .btn-quick, .btn-nav-share, .btn-action-pdf, .btn-action-csv, .btn-action-share, .btn-action-edit');
+        if (btn) {
+            btn.classList.add('btn-clicked-active');
+            btn.classList.add('is-clicked');
+            setTimeout(() => {
+                btn.classList.remove('btn-clicked-active');
+                btn.classList.remove('is-clicked');
+            }, 380);
+        }
+    }, true);
+
     // Initial Render
     renderOverview();
 });
+

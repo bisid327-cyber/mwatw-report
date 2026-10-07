@@ -1667,58 +1667,123 @@ textarea.builder-input {
   white-space: nowrap;
 }
 
+/* ── Enhanced Interactive Report Actions (Hover & Active Click States) ── */
 .btn-action-pdf {
   background: linear-gradient(135deg, #0097D0 0%, #0373B3 100%) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .btn-action-pdf:hover {
   background: linear-gradient(135deg, #0373B3 0%, #074B96 100%) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(3, 115, 179, 0.35) !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(3, 115, 179, 0.5) !important;
+  border-color: #38bdf8 !important;
+}
+
+.btn-action-pdf:active, .btn-action-pdf.is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  background: #005f94 !important;
+  box-shadow: 0 0 18px rgba(0, 151, 208, 0.85), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+  border-color: #ffffff !important;
 }
 
 .btn-action-csv {
   background: rgba(255, 255, 255, 0.12) !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .btn-action-csv:hover {
-  background: rgba(255, 255, 255, 0.22) !important;
+  background: rgba(16, 185, 129, 0.22) !important;
   border-color: #34d399 !important;
   color: #34d399 !important;
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+.btn-action-csv:active, .btn-action-csv.is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  background: #059669 !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.85), inset 0 2px 4px rgba(0,0,0,0.3) !important;
 }
 
 .btn-action-share {
   background: rgba(255, 0, 102, 0.15) !important;
   color: #ff4d94 !important;
   border: 1px solid rgba(255, 0, 102, 0.35) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .btn-action-share:hover {
   background: var(--matw-pink) !important;
   color: #ffffff !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(255, 0, 102, 0.4) !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(255, 0, 102, 0.5) !important;
+  border-color: #ff3385 !important;
+}
+
+.btn-action-share:active, .btn-action-share.is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  background: #d80056 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 22px rgba(255, 0, 102, 0.95), inset 0 2px 4px rgba(0,0,0,0.3) !important;
 }
 
 .btn-action-edit {
   background: rgba(255, 255, 255, 0.12) !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .btn-action-edit:hover {
-  background: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(3, 115, 179, 0.28) !important;
   border-color: #38bdf8 !important;
   color: #38bdf8 !important;
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(3, 115, 179, 0.4) !important;
 }
 
-/* Secondary bottom dock in case user scrolls through long document */
+.btn-action-edit:active, .btn-action-edit.is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  background: #0284c7 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.85), inset 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+/* Back Button */
+#vw-back, #vw-back-bottom {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#vw-back:hover, #vw-back-bottom:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+#vw-back:active, #vw-back-bottom:active, #vw-back.is-clicked, #vw-back-bottom.is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  background: rgba(255, 255, 255, 0.38) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.6) !important;
+}
+
 .viewer-action-bar {
   display: flex;
   justify-content: space-between;
@@ -2037,11 +2102,132 @@ textarea.builder-input {
   transition: all 0.2s ease;
 }
 
-.report-card-quick-bar .btn-quick:hover {
-  background: rgba(0, 180, 182, 0.15);
-  border-color: var(--matw-cyan);
-  color: #ffffff;
-  transform: translateY(-1px);
+.report-card-quick-bar .btn-quick {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.report-card-quick-bar .btn-quick[data-share-id]:hover {
+  background: rgba(255, 0, 102, 0.18) !important;
+  border-color: var(--matw-pink) !important;
+  color: #ff4d94 !important;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(255, 0, 102, 0.35);
+}
+
+.report-card-quick-bar .btn-quick[data-share-id]:active, .report-card-quick-bar .btn-quick[data-share-id].is-clicked {
+  transform: scale(0.93) translateY(1px) !important;
+  background: var(--matw-pink) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(255, 0, 102, 0.85);
+}
+
+.report-card-quick-bar .btn-quick[data-pdf-id]:hover {
+  background: rgba(0, 151, 208, 0.18) !important;
+  border-color: var(--matw-cyan) !important;
+  color: var(--matw-cyan) !important;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 151, 208, 0.35);
+}
+
+.report-card-quick-bar .btn-quick[data-pdf-id]:active, .report-card-quick-bar .btn-quick[data-pdf-id].is-clicked {
+  transform: scale(0.93) translateY(1px) !important;
+  background: var(--matw-cyan) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(0, 151, 208, 0.85);
+}
+
+.report-card-quick-bar .btn-quick[data-csv-id]:hover {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border-color: #34d399 !important;
+  color: #34d399 !important;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.report-card-quick-bar .btn-quick[data-csv-id]:active, .report-card-quick-bar .btn-quick[data-csv-id].is-clicked {
+  transform: scale(0.93) translateY(1px) !important;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.85);
+}
+
+/* Report Card Main Actions */
+.report-card-actions [data-view-id] {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.report-card-actions [data-view-id]:hover {
+  background: #0373B3 !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(3, 115, 179, 0.45);
+}
+.report-card-actions [data-view-id]:active, .report-card-actions [data-view-id].is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  background: #0077b5 !important;
+  box-shadow: 0 0 16px rgba(0, 151, 208, 0.8);
+}
+
+.report-card-actions [data-edit-id] {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.report-card-actions [data-edit-id]:hover {
+  background: rgba(3, 115, 179, 0.15) !important;
+  border: 1px solid var(--matw-cyan) !important;
+  color: var(--matw-cyan) !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 14px rgba(3, 115, 179, 0.25);
+}
+.report-card-actions [data-edit-id]:active, .report-card-actions [data-edit-id].is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  background: var(--matw-cyan) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(0, 180, 182, 0.8);
+}
+
+/* Builder Actions */
+#btn-save-report, #btn-save-preview, #btn-new-report {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+#btn-new-report:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 180, 182, 0.5) !important;
+}
+#btn-new-report:active, #btn-new-report.is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  background: #007bb3 !important;
+  box-shadow: 0 0 18px rgba(0, 180, 182, 0.85);
+}
+
+#btn-save-report:hover, #btn-save-preview:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+#btn-save-report:active, #btn-save-preview:active, #btn-save-report.is-clicked, #btn-save-preview.is-clicked {
+  transform: scale(0.94) translateY(1px) !important;
+  filter: brightness(1.25);
+  box-shadow: 0 0 18px rgba(0, 180, 182, 0.8);
+}
+
+/* Universal Button Click Aura Animation */
+.btn-clicked-active {
+  animation: btnClickAura 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes btnClickAura {
+  0% {
+    transform: scale(0.92) translateY(1px);
+    filter: brightness(1.35) contrast(1.1);
+    box-shadow: 0 0 0 0 rgba(0, 180, 182, 0.85);
+  }
+  45% {
+    transform: scale(1.04) translateY(-1px);
+    box-shadow: 0 0 0 8px rgba(0, 180, 182, 0);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    filter: brightness(1) contrast(1);
+  }
 }
 
 /* ───────────────────────────────────────────────────────────── */
