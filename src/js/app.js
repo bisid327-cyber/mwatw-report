@@ -631,7 +631,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             
             <div style="margin-bottom: var(--space-8);">
-                <div class="bento-card" style="display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; background: linear-gradient(135deg, rgba(0, 180, 182, 0.1) 0%, rgba(255, 0, 102, 0.05) 100%); border-left: 4px solid var(--matw-cyan);">
+                <div class="bento-card" style="display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center;">
                     <div style="font-size: 3rem; color: var(--matw-cyan); padding: 0 var(--space-2);">
                         <i class="fa-solid fa-file-pdf"></i>
                     </div>
