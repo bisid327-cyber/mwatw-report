@@ -1051,25 +1051,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             <!-- Top Sticky Navigation & Desktop Toolbar -->
             <header class="viewer-top-bar" role="banner">
                 <div class="viewer-bar-left">
-                    <button class="btn btn-secondary btn-sm" id="vw-back" title="Return to Report List" aria-label="Back to reports list">
+                    <button class="btn-text" id="vw-back" title="Return to Report List" aria-label="Back to reports list">
                         <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
                     </button>
-                    <div class="viewer-bar-info">
-                        <span class="viewer-status-badge ${report.status === 'Published' ? 'published' : 'draft'}">${report.status}</span>
-                        <span class="viewer-title-chip" title="${report.title}">${report.title}</span>
-                    </div>
                 </div>
                 
                 <!-- Desktop Only Action Group (Hidden on mobile < 768px) -->
                 <div class="viewer-actions-desktop" role="toolbar" aria-label="Report actions">
-                    <button class="btn btn-secondary btn-sm btn-action-edit" id="vw-edit" title="Edit this report in Builder">
+                    <button class="btn-text" id="vw-edit" title="Edit this report in Builder">
                         <span>Edit</span>
                     </button>
-                    <button class="btn btn-secondary btn-sm btn-action-share" id="vw-share" title="Share via WhatsApp, Social & Direct Link">
+                    <button class="btn btn-primary btn-sm" id="vw-share" title="Share via WhatsApp, Social & Direct Link">
                         <span>Share</span>
                     </button>
                     <div class="export-dropdown-container">
-                        <button class="btn btn-secondary btn-sm btn-action-export" id="vw-export-toggle" aria-haspopup="menu" aria-expanded="false">
+                        <button class="btn-text" id="vw-export-toggle" aria-haspopup="menu" aria-expanded="false">
                             <span>Export <i class="fa-solid fa-chevron-down" style="font-size: 0.75em; margin-left: 4px;"></i></span>
                         </button>
                         <div class="export-dropdown-menu" id="vw-export-menu" role="menu">

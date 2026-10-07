@@ -1883,21 +1883,31 @@ textarea.builder-input {
 /* 2026 Report Viewer Unified Toolbar (Desktop) & Nav (Mobile)   */
 /* ───────────────────────────────────────────────────────────── */
 .viewer-top-bar {
-  position: sticky;
-  top: 8px;
-  z-index: 45;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 18px;
-  margin-bottom: 24px;
-  background: rgba(14, 38, 54, 0.88);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
-  transition: all 0.3s ease;
+  padding: 16px 0;
+  margin-bottom: 8px;
+  background: transparent;
+}
+
+.btn-text {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.btn-text:hover {
+  background-color: var(--surface-color-hover);
 }
 
 .viewer-bar-left {
@@ -2850,10 +2860,10 @@ textarea.builder-input { min-height: 112px; }
 .exec-hero-subtitle, .exec-hero-meta { color: #ffffff; }
 .exec-footer-tagline { font-size: 0.75rem; }
 .exec-footer-right { flex-wrap: wrap; }
-.viewer-top-bar { flex-wrap: wrap; gap: 12px; box-shadow: var(--glass-shadow); }
+.viewer-top-bar { flex-wrap: wrap; gap: 12px; box-shadow: none; }
 .viewer-bar-left { flex: 1 1 240px; }
 .viewer-actions-desktop { flex-wrap: wrap; }
-.viewer-top-bar #vw-back { color: #ffffff; }
+.viewer-top-bar #vw-back { color: inherit; }
 .viewer-status-badge.published, .viewer-status-badge.draft { color: #ffffff; }
 .btn-action-share, .dock-btn-share { color: #ffffff !important; }
 .btn-action-share:hover { background: #d80056 !important; }
