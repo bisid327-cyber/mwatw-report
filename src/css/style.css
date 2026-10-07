@@ -592,25 +592,73 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Print Styles for PDF */
+/* ───────────────────────────────────────────────────────────── */
+/* Print & Native PDF Styles (Zero Duplication & Clean Breaks)   */
+/* ───────────────────────────────────────────────────────────── */
 @media print {
   body {
-    background: white;
-    color: black;
+    background: #0d273a !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-  .sidebar { display: none; }
-  .bento-card {
-    border: 1px solid #ccc;
-    background: transparent;
-    break-inside: avoid;
+
+  /* Hide all app chrome, navigation, buttons, and overlays */
+  header,
+  .top-nav-bar,
+  .sidebar,
+  .sidebar-backdrop,
+  .viewer-action-bar-top,
+  .viewer-action-bar,
+  .toast-container,
+  .modern-modal-overlay,
+  .bg-image-container,
+  #global-footer,
+  button,
+  .btn {
+    display: none !important;
   }
-  * {
-    color: black !important;
+
+  .main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
   }
-  .bento-card-header i {
-    color: #333 !important;
+
+  .view-container {
+    padding: 0 !important;
+    margin: 0 !important;
   }
-  .bg-image-container { display: none; }
+
+  /* Printable Report Formatting */
+  .exec-report, #report-printable {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Prevent page-break slicing and duplicated elements across pages */
+  .exec-hero-banner,
+  .exec-intro-block,
+  .exec-kpi-strip,
+  .exec-section,
+  .exec-footer-banner,
+  .exec-kpi,
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .exec-section {
+    margin-bottom: 20px !important;
+  }
+
+  .exec-table {
+    page-break-inside: auto !important;
+  }
 }
 
 /* Desktop Media Query Modifications */

@@ -277,27 +277,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+        // ──────────────────────────────────
+    // Robust, Single-Instance Export PDF Engine (Zero Duplication)
     // ──────────────────────────────────
-    // Export PDF Engine
-    // ──────────────────────────────────
+    let isGeneratingPdf = false;
+
     function exportReportPdf(report, btnElement) {
+        if (isGeneratingPdf) {
+            showToast('PDF export is already in progress. Please wait...', 'warning');
+            return;
+        }
+
         const el = document.getElementById('report-printable');
         if (!el) {
             showToast('Printable report container not found', 'error');
             return;
         }
-        
+
+        isGeneratingPdf = true;
         let origHtml = '';
         if (btnElement) {
             origHtml = btnElement.innerHTML;
             btnElement.disabled = true;
             btnElement.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Preparing PDF...</span>';
         }
-        showToast('Generating high-resolution PDF document...', 'info', 4000);
-        
+        showToast('Generating high-resolution PDF report...', 'info', 3500);
+
+        // 1. Create a clean isolated clone to eliminate animation transforms and duplicate rendering
+        const clone = el.cloneNode(true);
+        clone.id = 'report-printable-clean-export';
+        clone.style.width = '820px';
+        clone.style.maxWidth = '820px';
+        clone.style.padding = '24px';
+        clone.style.background = '#0d273a';
+        clone.style.color = '#ffffff';
+
+        // Strip GSAP inline transforms, transitions, and hover states that cause duplicate rendering in html2canvas
+        clone.querySelectorAll('*').forEach(node => {
+            node.style.transform = 'none';
+            node.style.transition = 'none';
+            node.style.animation = 'none';
+            node.style.opacity = '1';
+            if (node.classList && (
+                node.classList.contains('exec-section') || 
+                node.classList.contains('exec-kpi') || 
+                node.classList.contains('exec-hero-banner') || 
+                node.classList.contains('exec-footer-banner') ||
+                node.tagName === 'TR'
+            )) {
+                node.style.pageBreakInside = 'avoid';
+                node.style.breakInside = 'avoid';
+            }
+        });
+
+        // 2. Mount in an isolated off-screen sandbox
+        const sandbox = document.createElement('div');
+        sandbox.style.position = 'fixed';
+        sandbox.style.left = '-9999px';
+        sandbox.style.top = '0';
+        sandbox.style.width = '840px';
+        sandbox.style.overflow = 'visible';
+        sandbox.style.zIndex = '-999';
+        sandbox.appendChild(clone);
+        document.body.appendChild(sandbox);
+
         const safeTitle = (report.title || 'Impact_Report').replace(/[^a-z0-9]/gi, '_');
         const opt = {
-            margin: [0.3, 0.3, 0.4, 0.3],
+            margin: [0.3, 0.3, 0.3, 0.3],
             filename: `${safeTitle}_MATW_Report.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
@@ -305,32 +351,47 @@ document.addEventListener('DOMContentLoaded', async () => {
                 useCORS: true, 
                 allowTaint: true,
                 logging: false,
-                backgroundColor: '#0d273a'
+                backgroundColor: '#0d273a',
+                windowWidth: 840
             },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            pagebreak: {
+                mode: ['avoid-all', 'css', 'legacy'],
+                avoid: ['.exec-section', '.exec-kpi', '.exec-hero-banner', '.exec-footer-banner', '.exec-table', 'tr']
+            }
+        };
+
+        const cleanup = () => {
+            if (sandbox && sandbox.parentNode) {
+                sandbox.parentNode.removeChild(sandbox);
+            }
+            isGeneratingPdf = false;
+            if (btnElement) {
+                btnElement.disabled = false;
+                btnElement.innerHTML = origHtml;
+            }
         };
 
         if (typeof html2pdf !== 'undefined') {
-            html2pdf().set(opt).from(el).save().then(() => {
+            html2pdf().set(opt).from(clone).save().then(() => {
                 if (btnElement) {
                     btnElement.innerHTML = '<i class="fa-solid fa-check"></i> <span>PDF Saved!</span>';
-                    setTimeout(() => {
-                        btnElement.innerHTML = origHtml;
-                        btnElement.disabled = false;
-                    }, 2500);
                 }
                 showToast('PDF downloaded successfully!', 'success');
+                setTimeout(cleanup, 1500);
             }).catch((err) => {
-                console.error("html2pdf failed:", err);
+                console.error("html2pdf error:", err);
+                cleanup();
                 fallbackPrintPdf(btnElement, origHtml);
             });
         } else {
+            cleanup();
             fallbackPrintPdf(btnElement, origHtml);
         }
     }
 
     function fallbackPrintPdf(btnElement, origHtml) {
-        showToast('Direct download issue — opening print-to-PDF view...', 'info');
+        showToast('Opening native browser Print / Save-as-PDF...', 'info');
         window.print();
         if (btnElement) {
             btnElement.innerHTML = origHtml;
@@ -637,16 +698,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
         });
-        document.querySelectorAll('[data-pdf-id]').forEach(btn => {
+                document.querySelectorAll('[data-pdf-id]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const rId = e.currentTarget.dataset.pdfId;
                 renderReportViewer(rId);
-                setTimeout(() => {
-                    const pdfBtn = document.getElementById('vw-pdf');
-                    const rep = getReports().find(r => r.id === rId);
-                    if (rep) exportReportPdf(rep, pdfBtn);
-                }, 300);
+                showToast('Report opened — click Export PDF to save.', 'info', 2500);
             });
         });
         document.querySelectorAll('[data-csv-id]').forEach(btn => {
