@@ -1062,18 +1062,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 <!-- Desktop Only Action Group (Hidden on mobile < 768px) -->
                 <div class="viewer-actions-desktop" role="toolbar" aria-label="Report actions">
-                    <button class="btn btn-primary btn-sm btn-action-pdf" id="vw-pdf" title="Export report as print-ready PDF">
-                        <i class="fa-solid fa-file-pdf"></i> <span>Export PDF</span>
-                    </button>
-                    <button class="btn btn-secondary btn-sm btn-action-csv" id="vw-csv" title="Download report dataset as CSV">
-                        <i class="fa-solid fa-file-csv"></i> <span>CSV</span>
+                    <button class="btn btn-secondary btn-sm btn-action-edit" id="vw-edit" title="Edit this report in Builder">
+                        <span>Edit</span>
                     </button>
                     <button class="btn btn-secondary btn-sm btn-action-share" id="vw-share" title="Share via WhatsApp, Social & Direct Link">
-                        <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+                        <span>Share</span>
                     </button>
-                    <button class="btn btn-secondary btn-sm btn-action-edit" id="vw-edit" title="Edit this report in Builder">
-                        <i class="fa-solid fa-pen"></i> <span>Edit</span>
-                    </button>
+                    <div class="export-dropdown-container">
+                        <button class="btn btn-secondary btn-sm btn-action-export" id="vw-export-toggle" aria-haspopup="menu" aria-expanded="false">
+                            <span>Export <i class="fa-solid fa-chevron-down" style="font-size: 0.75em; margin-left: 4px;"></i></span>
+                        </button>
+                        <div class="export-dropdown-menu" id="vw-export-menu" role="menu">
+                            <button class="export-menu-item" id="vw-pdf" role="menuitem">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <div class="export-item-text">
+                                    <span class="export-item-title">PDF</span>
+                                    <span class="export-item-desc">Export as PDF</span>
+                                </div>
+                            </button>
+                            <button class="export-menu-item" id="vw-csv" role="menuitem">
+                                <i class="fa-solid fa-table-cells"></i>
+                                <div class="export-item-text">
+                                    <span class="export-item-title">CSV</span>
+                                    <span class="export-item-desc">Export as CSV</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -1179,6 +1194,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         const csvDock = document.getElementById('dock-btn-csv');
         if (csvDesktop) csvDesktop.addEventListener('click', csvHandler);
         if (csvDock) csvDock.addEventListener('click', csvHandler);
+
+        // Export Dropdown Logic
+        const exportToggle = document.getElementById('vw-export-toggle');
+        const exportMenu = document.getElementById('vw-export-menu');
+        
+        if (exportToggle && exportMenu) {
+            const closeExportMenu = () => {
+                exportMenu.classList.remove('show');
+                exportToggle.setAttribute('aria-expanded', 'false');
+            };
+
+            exportToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isExpanded = exportMenu.classList.contains('show');
+                if (isExpanded) {
+                    closeExportMenu();
+                } else {
+                    exportMenu.classList.add('show');
+                    exportToggle.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!exportToggle.contains(e.target) && !exportMenu.contains(e.target)) {
+                    closeExportMenu();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeExportMenu();
+                }
+            });
+            
+            // Close after clicking an option
+            if (pdfDesktop) pdfDesktop.addEventListener('click', closeExportMenu);
+            if (csvDesktop) csvDesktop.addEventListener('click', closeExportMenu);
+        }
 
         // Wire Up Share Modal (Desktop Toolbar & Mobile Dock)
         const shareHandler = async () => {

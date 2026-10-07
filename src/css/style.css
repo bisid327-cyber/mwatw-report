@@ -2930,3 +2930,73 @@ textarea.builder-input { min-height: 112px; }
   .exec-report { margin-bottom: 0 !important; }
   .exec-kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Export Dropdown (Clean SaaS style) */
+.export-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.export-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 190px;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 4px;
+  z-index: 100;
+  flex-direction: column;
+}
+
+.export-dropdown-menu.show {
+  display: flex;
+}
+
+.export-menu-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+  transition: background-color 0.15s ease;
+}
+
+.export-menu-item:hover, .export-menu-item:focus-visible {
+  background-color: var(--surface-color-hover);
+  outline: none;
+}
+
+.export-menu-item i {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.export-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.export-item-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.export-item-desc {
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
