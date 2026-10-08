@@ -1298,18 +1298,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Wire Up Edit (Desktop Toolbar & Mobile Dock)
         const editHandler = () => {
-            if (report.layout !== 'custom' && window.MatwPageEditor) {
-                // Open the visual inline page editor for PDF-layout reports
-                window.MatwPageEditor.open(reportId, viewContainer, () => {
-                    renderReportViewer(reportId);
-                });
-                viewContainer.scrollTop = 0;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                renderReportBuilder(reportId);
-                viewContainer.scrollTop = 0;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            window.MatwPageEditor.open(reportId, viewContainer, () => {
+                renderReportViewer(reportId);
+            });
+            viewContainer.scrollTop = 0;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
         const editDesktop = document.getElementById('vw-edit');
         const editDock = document.getElementById('dock-btn-edit');
