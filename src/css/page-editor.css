@@ -1,0 +1,231 @@
+/* Page Editor — Visual inline PDF editor styles */
+
+/* Register extracted PDF fonts for the editor */
+@font-face { font-family: PDF0; src: url('../assets/report-template/font-branding-semibold.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: PDF1; src: url('../assets/report-template/font-branding-black.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: PDF2; src: url('../assets/report-template/font-branding-bold.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: PDF3; src: url('../assets/report-template/font-branding-medium.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: PDF4; src: url('../assets/report-template/font-gotchastandup.ttf') format('truetype'); font-display: swap; }
+
+.pe-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+/* ── Toolbar ── */
+.pe-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--surface-color);
+    flex-shrink: 0;
+}
+
+.pe-toolbar-left,
+.pe-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pe-toolbar-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pe-page-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    min-width: 100px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.pe-nav-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pe-nav-btn:hover:not(:disabled) {
+    background: var(--surface-color-hover);
+    border-color: var(--matw-cyan);
+}
+
+.pe-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.pe-bar-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: background-color 0.15s ease;
+}
+
+.pe-bar-btn:hover:not(:disabled) {
+    background: var(--surface-color-hover);
+}
+
+.pe-bar-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.pe-bar-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border-color);
+}
+
+.pe-bar-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* ── Element toolbar (contextual) ── */
+.pe-element-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: var(--surface-color-hover);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+/* ── Viewport ── */
+.pe-viewport {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #e5e7eb;
+    display: flex;
+    justify-content: center;
+    padding: 32px 24px;
+}
+
+.pe-canvas-wrapper {
+    width: 100%;
+    max-width: 800px;
+}
+
+.pe-canvas {
+    position: relative;
+    width: 100%;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    container-type: inline-size;
+}
+
+/* ── Elements ── */
+.pe-bg-image {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+}
+
+.pe-artwork {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.pe-element {
+    position: absolute;
+    cursor: pointer;
+    z-index: 3;
+    border: 1.5px solid transparent;
+    transition: border-color 0.12s ease;
+}
+
+.pe-element:hover {
+    border-color: rgba(3, 115, 179, 0.35);
+}
+
+.pe-element.pe-selected {
+    border-color: var(--matw-cyan);
+    box-shadow: 0 0 0 2px rgba(3, 115, 179, 0.15);
+}
+
+.pe-element.pe-editing {
+    border-color: var(--matw-cyan);
+    box-shadow: 0 0 0 2px rgba(3, 115, 179, 0.25);
+    outline: none;
+    cursor: text;
+}
+
+/* Text elements */
+.pe-text {
+    word-break: break-word;
+    white-space: pre-wrap;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Image elements */
+.pe-image {
+    overflow: hidden;
+}
+
+.pe-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .pe-viewport {
+        padding: 16px 8px;
+    }
+
+    .pe-toolbar {
+        padding: 6px 10px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .pe-toolbar-center {
+        order: -1;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pe-page-label {
+        font-size: 0.75rem;
+    }
+}

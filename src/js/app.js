@@ -1,5 +1,6 @@
 // Main Application Logic — V2 Report Studio
 document.addEventListener('DOMContentLoaded', async () => {
+    await window.MatwPdfTemplate.ready;
     // 1. Fetch Report Data (default metrics template)
     let reportData = null;
     try {
@@ -277,9 +278,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ──────────────────────────────────
     let isGeneratingPdf = false;
 
-    function exportReportPdf(report, btnElement) {
+    async function exportReportPdf(report, btnElement) {
         if (isGeneratingPdf) {
             showToast('PDF export is already in progress. Please wait...', 'warning');
+            return;
+        }
+
+        if (report.layout !== 'custom') {
+            isGeneratingPdf = true;
+            const original = btnElement?.innerHTML;
+            if (btnElement) btnElement.disabled = true;
+            try {
+                await window.MatwPdfTemplate.exportPdf(report, text => { if (btnElement) btnElement.textContent = text; });
+                showToast('17-page report downloaded successfully.', 'success');
+            } catch (error) {
+                console.error('Reference PDF export failed', error);
+                showToast('Unable to export the report. Please reload and try again.', 'error');
+            } finally {
+                isGeneratingPdf = false;
+                if (btnElement) { btnElement.disabled = false; btnElement.innerHTML = original; }
+            }
             return;
         }
 
@@ -748,13 +766,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         let logoImage = existing && existing.logoImage ? existing.logoImage : '';
 
         // Build section editors
-        const sections = existing ? existing.sections : (reportData && reportData.keyMetrics ? reportData.keyMetrics.map((m, i) => ({
+        const sourceSections = existing ? existing.sections : (reportData && reportData.keyMetrics ? reportData.keyMetrics.map((m, i) => ({
             id: m.id || ('sec_' + i),
             title: m.pageData ? m.pageData.title : m.title,
             visible: true,
             iconImage: '',
             metrics: (m.pageData && m.pageData.metrics ? m.pageData.metrics : [{ label: m.title, value: m.value }]).map(met => ({ ...met, visible: true }))
         })) : []);
+
+        const sections = window.MatwPdfTemplate.enrichSections(sourceSections);
 
         let sectionsHtml = sections.map((sec, si) => {
             let metricsRows = sec.metrics.map((met, mi) => `
@@ -827,6 +847,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <!-- Step 3: Branding -->
                 <div class="builder-step">
                     <h4><span class="step-badge">3</span> Branding</h4>
+                    <div class="builder-field" style="margin-bottom:16px;">
+                        <label for="b-layout">Report design</label>
+                        <select id="b-layout" class="builder-input">
+                            <option value="reference" ${existing?.layout !== 'custom' ? 'selected' : ''}>Original PDF — 17 pages</option>
+                            <option value="custom" ${existing?.layout === 'custom' ? 'selected' : ''}>Custom report</option>
+                        </select>
+                        <p style="font-size:0.875rem;margin:0;">Original PDF preserves its titles, photos and artwork. Figures and reporting dates come from this form; empty figures appear as a dash. The image and typography settings below apply to the custom report.</p>
+                    </div>
                     <div class="builder-row">
                         <div class="builder-field">
                             <label for="b-font">Typography</label>
@@ -894,6 +922,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const mets = [];
                 metricEls.forEach((metEl) => {
                     mets.push({
+                        templateKey: sections[si].metrics[mets.length]?.templateKey,
                         label: metEl.querySelector('[data-field="label"]').value,
                         value: metEl.querySelector('[data-field="value"]').value,
                         visible: true
@@ -916,6 +945,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endDate: document.getElementById('b-end').value,
                 introduction: document.getElementById('b-intro').value,
                 font: document.getElementById('b-font').value,
+                layout: document.getElementById('b-layout').value,
                 status: document.getElementById('b-status').value,
                 bgImage: bgImage,
                 logoImage: logoImage,
@@ -1170,6 +1200,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (report.logoImage) document.querySelector('.exec-hero-logo').style.filter = 'none';
 
+        if (report.layout !== 'custom') {
+            const printable = document.getElementById('report-printable');
+            window.MatwPdfTemplate.render(report, printable);
+            const missing = window.MatwPdfTemplate.missing(report);
+            const note = document.createElement('p');
+            note.className = 'pdf-template-note';
+            note.textContent = missing.length
+                ? `Original PDF design · 17 pages. ${missing.length} figures need system values and are shown as a dash. Use Edit to complete them.`
+                : 'Original PDF design · 17 pages. Figures and reporting dates are supplied by the system.';
+            printable.before(note);
+        }
+
         // Keep report content visible immediately, including background tabs and exports.
 
         // Wire Up PDF Export (Desktop Toolbar & Mobile Dock)
@@ -1256,9 +1298,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Wire Up Edit (Desktop Toolbar & Mobile Dock)
         const editHandler = () => {
-            renderReportBuilder(reportId);
-            viewContainer.scrollTop = 0;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (report.layout !== 'custom' && window.MatwPageEditor) {
+                // Open the visual inline page editor for PDF-layout reports
+                window.MatwPageEditor.open(reportId, viewContainer, () => {
+                    renderReportViewer(reportId);
+                });
+                viewContainer.scrollTop = 0;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                renderReportBuilder(reportId);
+                viewContainer.scrollTop = 0;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         };
         const editDesktop = document.getElementById('vw-edit');
         const editDock = document.getElementById('dock-btn-edit');
